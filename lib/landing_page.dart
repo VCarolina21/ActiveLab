@@ -15,7 +15,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double sliderWidth = screenWidth * 0.85; 
-    double buttonWidth = 110.0;
+    double thumbWidth = 100.0; 
 
     Color topColor = Color.lerp(const Color(0xFF2E5BCC), const Color(0xFF63B8FF), _dragPosition)!;
     Color bottomColor = Color.lerp(const Color(0xFF4285F4), const Color(0xFF90CAF9), _dragPosition)!;
@@ -34,25 +34,24 @@ class _LandingPageState extends State<LandingPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Spacer(flex: 5),
+              const Spacer(flex: 8), 
               
               _buildLargeText("Seamless", isOutline: false),
               _buildLargeText("access to", isOutline: true),
               _buildLargeText("your", isOutline: false),
               _buildLargeText("wellness", isOutline: true),
               
-              const Spacer(flex: 2),
+              const SizedBox(height: 40), 
 
               Center(
                 child: Container(
-                  margin: const EdgeInsets.only(bottom: 60),
+                  margin: const EdgeInsets.only(bottom: 50), 
                   width: sliderWidth,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Stack(
@@ -60,24 +59,24 @@ class _LandingPageState extends State<LandingPage> {
                       const Align(
                         alignment: Alignment.centerRight,
                         child: Padding(
-                          padding: EdgeInsets.only(right: 25),
-                          child: Icon(Icons.double_arrow_rounded, color: Colors.white, size: 24),
+                          padding: EdgeInsets.only(right: 20),
+                          child: Icon(Icons.chevron_right, color: Colors.black, size: 28),
                         ),
                       ),
 
                       Positioned(
-                        left: _dragPosition * (sliderWidth - buttonWidth),
+                        left: _dragPosition * (sliderWidth - thumbWidth - 10) + 5,
+                        top: 5,
                         child: GestureDetector(
                           onHorizontalDragUpdate: (details) {
                             setState(() {
-                              _dragPosition += details.delta.dx / (sliderWidth - buttonWidth);
+                              _dragPosition += details.delta.dx / (sliderWidth - thumbWidth);
                               _dragPosition = _dragPosition.clamp(0.0, 1.0);
                             });
                           },
                           onHorizontalDragEnd: (details) {
                             if (_dragPosition > 0.8) {
                               setState(() => _dragPosition = 1.0);
-                              
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -87,19 +86,19 @@ class _LandingPageState extends State<LandingPage> {
                             }
                           },
                           child: Container(
-                            width: buttonWidth,
-                            height: 60,
+                            width: thumbWidth,
+                            height: 50,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(30),
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(25),
                             ),
                             child: const Center(
                               child: Text(
                                 "Let's Go",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black,
+                                  fontSize: 15,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),

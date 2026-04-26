@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:activelab/sign_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
@@ -154,7 +155,12 @@ class _LoginPageState extends State<LoginPage> {
                           width: double.infinity,
                           height: 55,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const SignPage()),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF63B8FF),
                               shape: RoundedRectangleBorder(
