@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'register_page.dart';
+import 'real_login_page.dart';
 
 class SignPage extends StatefulWidget {
   const SignPage({super.key});
@@ -13,18 +15,23 @@ class _SignPageState extends State<SignPage> {
 
   @override
   Widget build(BuildContext context) {
-    const double sliderWidth = 220.0;
-    const double thumbWidth = 90.0;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double sliderWidth = screenWidth * 0.55; 
+    double thumbWidth = 100.0; 
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
+          // 1. Background Image (sign.jpg)
           SizedBox.expand(
             child: Image.asset(
               'assets/sign.jpg',
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[900]),
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[900],
+                child: const Center(child: Text("Image not found", style: TextStyle(color: Colors.white))),
+              ),
             ),
           ),
 
@@ -43,7 +50,10 @@ class _SignPageState extends State<SignPage> {
                           color: Colors.black.withValues(alpha: 0.2),
                           borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
                           border: Border(
-                            top: BorderSide(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+                            top: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.3), 
+                              width: 1.5,
+                            ),
                           ),
                         ),
                       ),
@@ -51,7 +61,7 @@ class _SignPageState extends State<SignPage> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 40),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -79,21 +89,22 @@ class _SignPageState extends State<SignPage> {
                           children: [
                             Container(
                               width: sliderWidth,
-                              height: 55,
+                              height: 60,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Colors.black,
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: Stack(
                                 children: [
+                                  // Icon Panah Petunjuk
                                   const Align(
                                     alignment: Alignment.centerRight,
                                     child: Padding(
                                       padding: EdgeInsets.only(right: 15),
-                                      child: Icon(Icons.chevron_right, color: Colors.black, size: 24),
+                                      child: Icon(Icons.keyboard_double_arrow_right, color: Colors.white, size: 24),
                                     ),
                                   ),
-                                  
+
                                   Positioned(
                                     left: _dragPosition * (sliderWidth - thumbWidth - 10) + 5,
                                     top: 5,
@@ -107,22 +118,30 @@ class _SignPageState extends State<SignPage> {
                                       onHorizontalDragEnd: (details) {
                                         if (_dragPosition > 0.8) {
                                           setState(() => _dragPosition = 1.0);
-                                          debugPrint("Pindah ke Register Page");
+                                          
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => const RegisterPage()),
+                                          );
                                         } else {
                                           setState(() => _dragPosition = 0.0);
                                         }
                                       },
                                       child: Container(
                                         width: thumbWidth,
-                                        height: 45,
+                                        height: 50,
                                         decoration: BoxDecoration(
-                                          color: Colors.black,
+                                          color: Colors.white,
                                           borderRadius: BorderRadius.circular(25),
                                         ),
                                         child: const Center(
                                           child: Text(
                                             "Join Now",
-                                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -132,15 +151,18 @@ class _SignPageState extends State<SignPage> {
                               ),
                             ),
                             
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
 
                             Expanded(
                               child: InkWell(
                                 onTap: () {
-                                  debugPrint("Pindah ke Login Page");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const RealLoginPage()),
+                                  );
                                 },
                                 child: Container(
-                                  height: 55,
+                                  height: 60,
                                   decoration: BoxDecoration(
                                     color: Colors.white.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(30),
@@ -148,7 +170,10 @@ class _SignPageState extends State<SignPage> {
                                   child: const Center(
                                     child: Text(
                                       "Log in",
-                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: Colors.white, 
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
