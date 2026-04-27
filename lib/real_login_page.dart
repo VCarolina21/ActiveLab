@@ -14,12 +14,13 @@ class RealLoginPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
+            colors: [Color(0xFF90CAF9), Color(0xFF4285F4)], // Tetap warna biru awal
           ),
         ),
         child: Column(
           children: [
             const SizedBox(height: 60),
+            // Tombol Back
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
@@ -39,47 +40,19 @@ class RealLoginPage extends StatelessWidget {
             
             const Spacer(flex: 1),
             
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            Center(
+              child: Image.asset(
+                'assets/logoactivelab.png',
+                width: 400,
+                height: 400,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Column(
                   children: [
-                    const Text(
-                      "A",
-                      style: TextStyle(
-                        fontSize: 60,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Container(
-                      height: 80,
-                      width: 1.5,
-                      color: Colors.black.withValues(alpha: 0.5),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      "L",
-                      style: TextStyle(
-                        fontSize: 60,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black,
-                      ),
-                    ),
+                    Icon(Icons.broken_image, size: 50, color: Colors.white),
+                    Text("Logo Not Found", style: TextStyle(color: Colors.white)),
                   ],
                 ),
-                const Text(
-                  "ACTIVE LAB",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 4,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
+              ),
             ),
             
             const Spacer(flex: 2),
@@ -103,15 +76,12 @@ class RealLoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   
-                  // Input Name
                   _buildInputField(hint: "Name"),
                   const SizedBox(height: 15),
-                  
-                  // Input Password
                   _buildInputField(hint: "Password", isPassword: true),
                   
                   const SizedBox(height: 30),
-                
+                  
                   SizedBox(
                     width: double.infinity,
                     height: 55,
@@ -154,7 +124,6 @@ class RealLoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
                 ],
               ),
             ),
