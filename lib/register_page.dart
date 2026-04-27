@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'real_login_page.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  String? _selectedGender;
+  bool _showGenderError = false;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +43,6 @@ class RegisterPage extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // Foto Profil
             CircleAvatar(
               radius: 50,
               backgroundColor: Colors.grey[300],
@@ -53,19 +60,47 @@ class RegisterPage extends StatelessWidget {
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Gender (Optional)", 
+                "Gender (Required)", 
                 style: TextStyle(fontWeight: FontWeight.bold)
               ),
             ),
+            
             Row(
               children: [
-                Checkbox(value: false, onChanged: (v) {}), 
+                Checkbox(
+                  value: _selectedGender == "Male", 
+                  shape: const CircleBorder(),
+                  onChanged: (v) {
+                    setState(() {
+                      _selectedGender = "Male";
+                      _showGenderError = false;
+                    });
+                  }
+                ), 
                 const Text("Male"),
                 const SizedBox(width: 20),
-                Checkbox(value: false, onChanged: (v) {}), 
+                Checkbox(
+                  value: _selectedGender == "Female", 
+                  shape: const CircleBorder(),
+                  onChanged: (v) {
+                    setState(() {
+                      _selectedGender = "Female";
+                      _showGenderError = false;
+                    });
+                  }
+                ), 
                 const Text("Female"),
               ],
             ),
+
+            if (_showGenderError)
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "* Please select your gender",
+                  style: TextStyle(color: Colors.red, fontSize: 12),
+                ),
+              ),
             
             const SizedBox(height: 40),
             
@@ -93,17 +128,25 @@ class RegisterPage extends StatelessWidget {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF90CAF9), Color(0xFF4285F4)]
+                      gradient: LinearGradient(
+                        colors: _selectedGender != null 
+                          ? [const Color(0xFF90CAF9), const Color(0xFF4285F4)]
+                          : [Colors.grey.shade400, Colors.grey.shade400]
                       ),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const RealLoginPage()),
-                        );
+                        if (_selectedGender == null) {
+                          setState(() {
+                            _showGenderError = true;
+                          });
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const RealLoginPage()),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
