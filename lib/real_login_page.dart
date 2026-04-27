@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'interest_page.dart';
 
 class RealLoginPage extends StatelessWidget {
   const RealLoginPage({super.key});
@@ -6,6 +7,7 @@ class RealLoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -18,53 +20,141 @@ class RealLoginPage extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 60),
-            // Tombol Back
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.only(left: 20),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
               ),
             ),
-            const Text(
-              "A   L\nACTIVE LAB",
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 5),
+            
+            const Spacer(flex: 1),
+            
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "A",
+                      style: TextStyle(
+                        fontSize: 60,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      height: 80,
+                      width: 1.5,
+                      color: Colors.black.withValues(alpha: 0.5),
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      "L",
+                      style: TextStyle(
+                        fontSize: 60,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                const Text(
+                  "ACTIVE LAB",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 4,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             ),
-            const Spacer(),
+            
+            const Spacer(flex: 2),
+
             Container(
-              padding: const EdgeInsets.all(30),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
               ),
               child: Column(
                 children: [
-                  const Text("Login", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "Login",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                   const SizedBox(height: 30),
-                  _buildInput("Name"),
+                  
+                  // Input Name
+                  _buildInputField(hint: "Name"),
                   const SizedBox(height: 15),
-                  _buildInput("Password", isPassword: true),
+                  
+                  // Input Password
+                  _buildInputField(hint: "Password", isPassword: true),
+                  
                   const SizedBox(height: 30),
+                
                   SizedBox(
                     width: double.infinity,
                     height: 55,
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [Color(0xFF90CAF9), Color(0xFF4285F4)]),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
+                        ),
                         borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF4285F4).withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
                       child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
-                        child: const Text("Next", style: TextStyle(color: Colors.white, fontSize: 18)),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const InterestPage()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: const Text(
+                          "Next",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -74,12 +164,25 @@ class RealLoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInput(String hint, {bool isPassword = false}) {
+  Widget _buildInputField({required String hint, bool isPassword = false}) {
     return TextField(
       obscureText: isPassword,
       decoration: InputDecoration(
         hintText: hint,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+        hintStyle: const TextStyle(color: Colors.black38),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.black12),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.black12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Color(0xFF4285F4), width: 1.5),
+        ),
       ),
     );
   }
