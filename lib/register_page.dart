@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'real_login_page.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -10,6 +11,7 @@ class RegisterPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: false,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
@@ -23,46 +25,66 @@ class RegisterPage extends StatelessWidget {
             ),
           ),
         ),
-        title: const Text("Your Profile", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Your Profile", 
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 25),
         child: Column(
           children: [
             const SizedBox(height: 20),
+            // Foto Profil
             CircleAvatar(
               radius: 50,
               backgroundColor: Colors.grey[300],
               child: const Icon(Icons.person, size: 60, color: Colors.black),
             ),
             const SizedBox(height: 30),
-            // Input Fields
+            
             _buildTextField("Name"),
             _buildTextField("Email"),
             _buildTextField("Password", isPassword: true),
             _buildTextField("Phone Number"),
+            
             const SizedBox(height: 20),
+            
             const Align(
               alignment: Alignment.centerLeft,
-              child: Text("Gender (Optional)", style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(
+                "Gender (Optional)", 
+                style: TextStyle(fontWeight: FontWeight.bold)
+              ),
             ),
             Row(
               children: [
-                Checkbox(value: false, onChanged: (v) {}), const Text("Male"),
+                Checkbox(value: false, onChanged: (v) {}), 
+                const Text("Male"),
                 const SizedBox(width: 20),
-                Checkbox(value: false, onChanged: (v) {}), const Text("Female"),
+                Checkbox(value: false, onChanged: (v) {}), 
+                const Text("Female"),
               ],
             ),
+            
             const SizedBox(height: 40),
+            
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RealLoginPage()),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[700],
                       padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25)
+                      ),
                     ),
                     child: const Text("Skip", style: TextStyle(color: Colors.white)),
                   ),
@@ -71,22 +93,36 @@ class RegisterPage extends StatelessWidget {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF90CAF9), Color(0xFF4285F4)]),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF90CAF9), Color(0xFF4285F4)]
+                      ),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RealLoginPage()),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
                         padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25)
+                        ),
                       ),
-                      child: const Text("Continue", style: TextStyle(color: Colors.white)),
+                      child: const Text(
+                        "Continue", 
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -102,8 +138,15 @@ class RegisterPage extends StatelessWidget {
           hintText: label,
           filled: true,
           fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15), 
+            borderSide: BorderSide.none
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15), 
+            borderSide: BorderSide.none
+          ),
         ),
       ),
     );
