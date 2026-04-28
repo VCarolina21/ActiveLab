@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'notif_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -15,7 +16,7 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              _buildHeader(),
+              _buildHeader(context),
               const SizedBox(height: 25),
               _buildChallengeCard(),
               const SizedBox(height: 25),
@@ -30,7 +31,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       children: [
         const CircleAvatar(
@@ -47,19 +48,27 @@ class HomePage extends StatelessWidget {
           ],
         ),
         const Spacer(),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1), 
-                blurRadius: 4,
-              )
-            ],
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NotifPage()),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1), 
+                  blurRadius: 4,
+                )
+              ],
+            ),
+            child: const Icon(Icons.notifications_none_outlined, color: Colors.black),
           ),
-          child: const Icon(Icons.notifications_none_outlined, color: Colors.black),
         ),
       ],
     );
@@ -194,7 +203,6 @@ class HomePage extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 15),
-        // Filter Chips
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -210,7 +218,7 @@ class HomePage extends StatelessWidget {
         const SizedBox(height: 20),
         _buildGymCard("GYM 2", "Bali", "3,8", "40/100", "assets/gymuntar.heic"),
         const SizedBox(height: 20),
-        _buildGymCard("GYM 3", "Bogor", "4,5", "25/50", "assets/gymuntar.heic"),
+        _buildGymCard("GYM 3", "Puncak", "4,5", "20/50", "assets/gymuntar.heic"),
       ],
     );
   }
