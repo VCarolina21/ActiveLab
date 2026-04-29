@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'notif_page.dart';
-import 'explore_page.dart';
+
+import '../explore/explore_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

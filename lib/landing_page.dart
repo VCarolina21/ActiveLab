@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'sign_page.dart';
+
+import 'login_page/login_page.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -83,7 +84,7 @@ class _LandingPageState extends State<LandingPage> {
                               setState(() => _dragPosition = 1.0);
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const SignPage()),
+                                MaterialPageRoute(builder: (context) => const LoginPage()),
                               );
                             } else {
                               setState(() => _dragPosition = 0.0);

@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:activelab/sign_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
+
+import '../sign_in/sign_page.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -96,7 +97,6 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
                           border: Border(
                             top: BorderSide(
-                              // Update: Menggunakan .withValues untuk border atas
                               color: Colors.white.withValues(alpha: 0.3),
                               width: 1.5,
                             ),

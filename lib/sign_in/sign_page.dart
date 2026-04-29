@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+
 import 'register_page.dart';
 import 'real_login_page.dart';
 
@@ -23,7 +24,6 @@ class _SignPageState extends State<SignPage> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 1. Background Image (sign.jpg)
           SizedBox.expand(
             child: Image.asset(
               'assets/sign.jpg',
@@ -96,12 +96,15 @@ class _SignPageState extends State<SignPage> {
                               ),
                               child: Stack(
                                 children: [
-                                  // Icon Panah Petunjuk
                                   const Align(
                                     alignment: Alignment.centerRight,
                                     child: Padding(
                                       padding: EdgeInsets.only(right: 15),
-                                      child: Icon(Icons.keyboard_double_arrow_right, color: Colors.white, size: 24),
+                                      child: Icon(
+                                        Icons.keyboard_double_arrow_right, 
+                                        color: Colors.white, 
+                                        size: 24
+                                      ),
                                     ),
                                   ),
 
