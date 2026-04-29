@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math'; 
+
 import 'notif_page.dart';
 import '../explore/explore_page.dart';
 
@@ -16,7 +17,6 @@ class _HomePageState extends State<HomePage> {
   final Random _random = Random();
 
   final List<Map<String, String>> allLocations = [
-    
     {"name": "ActiveFit Gym", "loc": "Jakarta Utara", "type": "Gym", "img": "assets/gymuntar.heic"},
     {"name": "ActiveFit Spa", "loc": "Jakarta Utara", "type": "Spa", "img": "assets/spa.JPG"},
     {"name": "ActiveFit Pilates", "loc": "Jakarta Utara", "type": "Pilates", "img": "assets/pilates.JPG"},
@@ -60,7 +60,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Logic Filter
     List<Map<String, String>> filteredList = selectedCategory == "All"
         ? allLocations
         : allLocations.where((item) => item['type'] == selectedCategory).toList();
@@ -99,9 +98,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 20),
                 Column(
                   children: filteredList.map((data) {
-                    // ACAK RATING (3.7 - 5.0)
                     double randomRate = 3.7 + _random.nextDouble() * 1.3;
-                    // ACAK NOMOR RUANGAN / KAPASITAS (maks 50)
                     int curCap = _random.nextInt(51); 
                     
                     return Padding(
@@ -151,7 +148,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15), // Shadow Gelap
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 15,
             offset: const Offset(0, 6),
           )
@@ -240,19 +237,70 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildWeeklyTarget() {
+    int currentStreak = 3;
+
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))]),
       child: Column(children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("WEEKLY TARGET", style: TextStyle(fontWeight: FontWeight.bold)), IconButton(icon: const Icon(Icons.ios_share, size: 18), onPressed: () {})]),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: List.generate(7, (i) => _dayCircle(i == 0, i + 1))),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          const Text("WEEKLY TARGET", style: TextStyle(fontWeight: FontWeight.bold)),
+          IconButton(icon: const Icon(Icons.ios_share, size: 18), onPressed: () {}),
+        ]),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+          children: List.generate(7, (i) {
+            int dayNumber = i + 1;
+            bool isReached = dayNumber <= currentStreak;
+            bool showFire = dayNumber == currentStreak;
+            return _dayCircle(isReached, dayNumber, showFire);
+          }),
+        ),
       ]),
     );
   }
 
-  Widget _dayCircle(bool isSelected, int day) {
-    return Container(width: 35, height: 35, decoration: BoxDecoration(shape: BoxShape.circle, color: isSelected ? const Color(0xFFE3F2FD) : Colors.transparent, border: Border.all(color: isSelected ? const Color(0xFF4285F4) : Colors.transparent)),
-      child: Center(child: Text("$day", style: TextStyle(color: isSelected ? const Color(0xFF4285F4) : Colors.grey, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal))));
+  Widget _dayCircle(bool isReached, int day, bool showFire) {
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: 35, 
+          height: 35, 
+          decoration: BoxDecoration(
+            shape: BoxShape.circle, 
+            color: isReached ? const Color(0xFFE3F2FD) : Colors.transparent, 
+            border: Border.all(color: isReached ? const Color(0xFF4285F4) : Colors.grey[300]!)
+          ),
+          child: Center(
+            child: Text(
+              "$day", 
+              style: TextStyle(
+                color: isReached ? const Color(0xFF4285F4) : Colors.grey, 
+                fontWeight: isReached ? FontWeight.bold : FontWeight.normal
+              )
+            )
+          ),
+        ),
+        if (showFire)
+          Positioned(
+            top: -12,
+            right: -5,
+            child: Icon(
+              Icons.local_fire_department_rounded,
+              color: const Color(0xFF4285F4),
+              size: 20,
+              shadows: [
+                Shadow(
+                  color: const Color(0xFF4285F4).withOpacity(0.4),
+                  blurRadius: 10,
+                )
+              ],
+            ),
+          ),
+      ],
+    );
   }
 
   Widget _buildBottomNav(BuildContext context) {
