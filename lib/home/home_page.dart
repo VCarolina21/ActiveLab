@@ -293,7 +293,7 @@ class _HomePageState extends State<HomePage> {
               size: 20,
               shadows: [
                 Shadow(
-                  color: const Color(0xFF4285F4).withOpacity(0.4),
+                  color: const Color(0xFF4285F4).withValues(alpha: 0.4),
                   blurRadius: 10,
                 )
               ],
