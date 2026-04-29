@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'notif_page.dart';
 import '../explore/explore_page.dart';
 
@@ -11,27 +10,41 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      bottomNavigationBar: _buildBottomNav(context),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              _buildHeader(context),
-              const SizedBox(height: 25),
-              _buildChallengeCard(),
-              const SizedBox(height: 25),
-              _buildWeeklyTarget(),
-              const SizedBox(height: 25),
-              _buildExploreSection(),
-              const SizedBox(height: 20),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFE3F2FD),
+              Colors.white,
             ],
+            stops: [0.0, 0.4],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                _buildHeader(context),
+                const SizedBox(height: 25),
+                _buildChallengeCard(),
+                const SizedBox(height: 25),
+                _buildWeeklyTarget(),
+                const SizedBox(height: 25),
+                _buildExploreSection(),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
+      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
@@ -40,17 +53,17 @@ class HomePage extends StatelessWidget {
       children: [
         const CircleAvatar(
           radius: 25,
-          backgroundColor: Color(0xFFE0E0E0),
+          backgroundColor: Colors.white,
           child: Icon(Icons.person, color: Colors.black),
         ),
         const SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Hello !", style: TextStyle(color: Colors.grey, fontSize: 14)),
+            const Text("Hello !", style: TextStyle(color: Colors.blueGrey, fontSize: 14)),
             Text(
-              userName.isNotEmpty ? userName : "User", 
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
+              userName.isNotEmpty ? userName : "User",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
             ),
           ],
         ),
@@ -69,12 +82,12 @@ class HomePage extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1), 
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 4,
                 )
               ],
             ),
-            child: const Icon(Icons.notifications_none_outlined, color: Colors.black),
+            child: const Icon(Icons.notifications_none_outlined, color: Colors.blue),
           ),
         ),
       ],
@@ -84,67 +97,93 @@ class HomePage extends StatelessWidget {
   Widget _buildChallengeCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
         borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 25,
+            offset: const Offset(0, 12),
+          ),
+        ],
       ),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF64B5F6), Color(0xFF1976D2)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Stack(
             children: [
-              const Text("30 Days", style: TextStyle(color: Colors.white70, fontSize: 14)),
-              const Text("WHOLE BODY\nCHALLENGE", 
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
-              const SizedBox(height: 15),
-              Container(
-                width: 120,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3), 
-                  borderRadius: BorderRadius.circular(5),
+              Positioned(
+                right: -210,
+                bottom: -45,
+                child: Image.asset(
+                  'assets/duduk.png',
+                  width: 700,
+                  fit: BoxFit.contain,
                 ),
-                child: Row(
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text("30 Days", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    const Text("WHOLE BODY\nCHALLENGE",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
+                    const SizedBox(height: 15),
+                    const Text("40% complete", style: TextStyle(color: Colors.white, fontSize: 12)),
+                    const SizedBox(height: 5),
                     Container(
-                      width: 50,
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
+                      width: 120,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: 0.4,
+                        child: Container(
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 0),
+                    const Text(
+                      "DAY 3",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 60,
+                        fontWeight: FontWeight.w900,
+                        shadows: [
+                          Shadow(color: Colors.black38, blurRadius: 12, offset: Offset(2, 2)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 0),
+                    ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1976D2),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        minimumSize: const Size(140, 40),
+                        elevation: 8,
+                      ),
+                      child: const Text("START", style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 5),
-              const Text("40% complete", style: TextStyle(color: Colors.white, fontSize: 12)),
-              const SizedBox(height: 10),
-              const Text("DAY 3", style: TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF4285F4),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  minimumSize: const Size(140, 40),
-                ),
-                child: const Text("START", style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
             ],
           ),
-          Positioned(
-            right: -10,
-            bottom: 0,
-            child: Icon(
-              Icons.fitness_center, 
-              size: 150, 
-              color: Colors.white.withValues(alpha: 0.2),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -157,8 +196,9 @@ class HomePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05), 
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           )
         ],
       ),
@@ -180,11 +220,12 @@ class HomePage extends StatelessWidget {
                 height: 35,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  color: isSelected ? const Color(0xFFE3F2FD) : Colors.transparent,
                   border: Border.all(color: isSelected ? const Color(0xFF4285F4) : Colors.transparent),
                 ),
                 child: Center(
                   child: Text(
-                    "${index + 1}", 
+                    "${index + 1}",
                     style: TextStyle(
                       color: isSelected ? const Color(0xFF4285F4) : Colors.grey,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -222,10 +263,8 @@ class HomePage extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         _buildGymCard("GYM 1", "Jakarta", "5,0", "60/60", "assets/gymuntar.heic"),
-        const SizedBox(height: 20),
+        const SizedBox(height: 15),
         _buildGymCard("GYM 2", "Bali", "3,8", "40/100", "assets/gymuntar.heic"),
-        const SizedBox(height: 20),
-        _buildGymCard("GYM 3", "Puncak", "4,5", "20/50", "assets/gymuntar.heic"),
       ],
     );
   }
@@ -250,8 +289,9 @@ class HomePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05), 
-            blurRadius: 5,
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
           )
         ],
       ),
@@ -260,7 +300,7 @@ class HomePage extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: SizedBox(
-              width: 80, 
+              width: 80,
               height: 80,
               child: Image.asset(
                 imagePath,
@@ -287,7 +327,7 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(capacity, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(capacity, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4285F4))),
               ],
             ),
           ),
@@ -306,7 +346,7 @@ class HomePage extends StatelessWidget {
   Widget _buildBottomNav(BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
-      currentIndex: 0, 
+      currentIndex: 0,
       selectedItemColor: const Color(0xFF4285F4),
       unselectedItemColor: Colors.grey,
       showUnselectedLabels: true,
