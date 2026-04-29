@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../interest/interest_page.dart';
 
 class RealLoginPage extends StatefulWidget {
@@ -25,7 +24,9 @@ class _RealLoginPageState extends State<RealLoginPage> {
     if (!_nameError && !_passwordError) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const InterestPage()),
+        MaterialPageRoute(
+          builder: (context) => InterestPage(userName: _nameController.text),
+        ),
       );
     }
   }
@@ -40,132 +41,133 @@ class _RealLoginPageState extends State<RealLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, 
-      body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          height: MediaQuery.of(context).size.height,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
-            ),
+      backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
+            stops: [0.0, 0.6],
           ),
-          child: Column(
-            children: [
-              const SizedBox(height: 60),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ),
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
               ),
-              
-              const Spacer(flex: 1),
-              
-              Center(
-                child: Image.asset(
-                  'assets/logoactivelab.png',
-                  width: 400,
-                  height: 300,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => const Column(
-                    children: [
-                      Icon(Icons.broken_image, size: 50, color: Colors.white),
-                      Text("Logo Not Found", style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-              ),
-              
-              const Spacer(flex: 2),
-
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-                ),
+              child: IntrinsicHeight(
                 child: Column(
                   children: [
-                    const Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                    const SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    
-                    _buildInputField(
-                      hint: "Name", 
-                      controller: _nameController, 
-                      isError: _nameError
-                    ),
-                    const SizedBox(height: 15),
-                    _buildInputField(
-                      hint: "Password", 
-                      isPassword: true, 
-                      controller: _passwordController, 
-                      isError: _passwordError
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Image.asset(
+                        'assets/logoactivelab.png',
+                        width: 280,
+                        height: 230,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                     
-                    const SizedBox(height: 30),
-                    
-                    SizedBox(
+                    const Spacer(),
+
+                    Container(
                       width: double.infinity,
-                      height: 55,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
-                          ),
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF4285F4).withValues(alpha: 0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: _handleLogin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: const Text(
-                            "Next",
+                      padding: const EdgeInsets.fromLTRB(30, 40, 30, 60),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            "Login",
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 30),
+                          _buildInputField(
+                            hint: "Name",
+                            controller: _nameController,
+                            isError: _nameError,
+                          ),
+                          const SizedBox(height: 15),
+                          _buildInputField(
+                            hint: "Password",
+                            isPassword: true,
+                            controller: _passwordController,
+                            isError: _passwordError,
+                          ),
+                          const SizedBox(height: 30),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 55,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
+                                ),
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF4285F4).withValues(alpha: 0.3),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton(
+                                onPressed: _handleLogin,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Next",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -173,10 +175,10 @@ class _RealLoginPageState extends State<RealLoginPage> {
   }
 
   Widget _buildInputField({
-    required String hint, 
-    bool isPassword = false, 
+    required String hint,
+    bool isPassword = false,
     required TextEditingController controller,
-    required bool isError
+    required bool isError,
   }) {
     return TextField(
       controller: controller,
@@ -195,7 +197,10 @@ class _RealLoginPageState extends State<RealLoginPage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: isError ? Colors.red : const Color(0xFF4285F4), width: 1.5),
+          borderSide: BorderSide(
+            color: isError ? Colors.red : const Color(0xFF4285F4),
+            width: 1.5,
+          ),
         ),
         errorText: isError ? "* Required" : null,
       ),

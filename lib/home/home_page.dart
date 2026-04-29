@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'notif_page.dart';
 
+import 'notif_page.dart';
 import '../explore/explore_page.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final String userName;
+
+  const HomePage({super.key, required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +44,14 @@ class HomePage extends StatelessWidget {
           child: Icon(Icons.person, color: Colors.black),
         ),
         const SizedBox(width: 12),
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Hello !", style: TextStyle(color: Colors.grey, fontSize: 14)),
-            Text("Budi", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text("Hello !", style: TextStyle(color: Colors.grey, fontSize: 14)),
+            Text(
+              userName.isNotEmpty ? userName : "User", 
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
+            ),
           ],
         ),
         const Spacer(),
@@ -194,7 +199,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // 4. Explore Section
   Widget _buildExploreSection() {
     return Column(
       children: [
@@ -302,7 +306,7 @@ class HomePage extends StatelessWidget {
   Widget _buildBottomNav(BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
-      currentIndex: 0, // Posisi di Home
+      currentIndex: 0, 
       selectedItemColor: const Color(0xFF4285F4),
       unselectedItemColor: Colors.grey,
       showUnselectedLabels: true,

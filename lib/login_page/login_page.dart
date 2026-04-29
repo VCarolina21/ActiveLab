@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       if (_pageController.hasClients) {
         _pageController.animateToPage(
           _currentPage,
-          duration: const Duration(milliseconds: 800),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         );
       }

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../home/home_page.dart'; 
 
 class InterestPage extends StatefulWidget {
-  const InterestPage({super.key});
+  final String userName; 
+
+  const InterestPage({super.key, required this.userName});
 
   @override
   State<InterestPage> createState() => _InterestPageState();
@@ -70,7 +72,9 @@ class _InterestPageState extends State<InterestPage> {
                         Navigator.pop(context);
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (context) => const HomePage()),
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(userName: widget.userName),
+                          ),
                           (route) => false,
                         );
                       },
