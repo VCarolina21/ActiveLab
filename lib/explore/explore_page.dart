@@ -58,8 +58,6 @@ class _ExplorePageState extends State<ExplorePage> {
             ),
           ],
         ),
-        const Spacer(),
-        const Icon(Icons.notifications_none_outlined, color: Colors.black, size: 28),
       ],
     );
   }
