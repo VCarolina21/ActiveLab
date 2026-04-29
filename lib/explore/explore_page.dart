@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ExplorePage extends StatelessWidget {
-  const ExplorePage({super.key});
+class ExplorePage extends StatefulWidget {
+  final String userName;
 
+  const ExplorePage({super.key, required this.userName});
+
+  @override
+  State<ExplorePage> createState() => _ExplorePageState();
+}
+
+class _ExplorePageState extends State<ExplorePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +39,6 @@ class ExplorePage extends StatelessWidget {
     );
   }
 
-  // 1. Header
   Widget _buildHeader() {
     return Row(
       children: [
@@ -42,11 +48,14 @@ class ExplorePage extends StatelessWidget {
           child: Icon(Icons.person, color: Colors.black),
         ),
         const SizedBox(width: 12),
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Hallo !", style: TextStyle(color: Colors.grey, fontSize: 13)),
-            Text("Budi", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+            const Text("Hello !", style: TextStyle(color: Colors.grey, fontSize: 13)),
+            Text(
+              widget.userName.isNotEmpty ? widget.userName : "User", 
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+            ),
           ],
         ),
         const Spacer(),
@@ -55,7 +64,6 @@ class ExplorePage extends StatelessWidget {
     );
   }
 
-  // 2. Search Bar
   Widget _buildSearchBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -74,7 +82,6 @@ class ExplorePage extends StatelessWidget {
     );
   }
 
-  // 3. Last Booking Section (Ukuran Teks & Persen Diperbesar)
   Widget _buildLastBooking() {
     return Column(
       children: [
@@ -163,7 +170,6 @@ class ExplorePage extends StatelessWidget {
     );
   }
 
-  // 4. Mentor Section
   Widget _buildMentorSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +184,7 @@ class ExplorePage extends StatelessWidget {
               _buildMentorAvatar("John", "assets/coachcewe.JPG"),
               _buildMentorAvatar("Rudy", "assets/coachcowo.JPG"),
               _buildMentorAvatar("Kucing", "assets/coachcewe.JPG"),
-              _buildMentorAvatar("imut", "assets/coachcowo.JPG"),
+              _buildMentorAvatar("Imut", "assets/coachcowo.JPG"),
             ],
           ),
         ),
@@ -199,7 +205,6 @@ class ExplorePage extends StatelessWidget {
     );
   }
 
-  // 5. Most Popular Gym Section (Vertikal Lonjong dengan Shadow & Teks di Depan)
   Widget _buildPopularGymSection() {
     return Column(
       children: [
@@ -218,9 +223,9 @@ class ExplorePage extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildPopularCard("GYM 1", "Jakarta", "assets/gymuntar.heic", "6:00 PM", "Jhon"),
-              _buildPopularCard("GYM 2", "Jakarta", "assets/gymuntar.heic", "7:00 PM", "Jhon"),
-              _buildPopularCard("GYM 3", "Jakarta", "assets/gymuntar.heic", "7:00 PM", "Jhon"),
+              _buildPopularCard("GYM 1", "Jakarta", "assets/gymuntar.heic", "6:00 PM", "John"),
+              _buildPopularCard("GYM 2", "Jakarta", "assets/gymuntar.heic", "7:00 PM", "John"),
+              _buildPopularCard("GYM 3", "Jakarta", "assets/gymuntar.heic", "7:00 PM", "John"),
             ],
           ),
         ),

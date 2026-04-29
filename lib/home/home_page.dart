@@ -314,7 +314,9 @@ class HomePage extends StatelessWidget {
         if (index == 1) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ExplorePage()),
+            MaterialPageRoute(
+              builder: (context) => ExplorePage(userName: userName),
+            ),
           );
         }
       },
