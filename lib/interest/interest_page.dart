@@ -17,6 +17,7 @@ class _InterestPageState extends State<InterestPage> {
     "Strength Training",
     "Pilates",
     "Plunge Pool",
+    "Gym",
     "Cardio",
     "Physiotherapy",
     "Personal Training"
