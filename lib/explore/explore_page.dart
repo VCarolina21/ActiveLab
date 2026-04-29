@@ -98,9 +98,9 @@ class _ExplorePageState extends State<ExplorePage> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildBookingCard("GYM 1", "50 %", "assets/gymuntar.heic"),
+              _buildBookingCard("GYM 1", "50 %", "assets/gymuntar.jpg"),
               const SizedBox(width: 15),
-              _buildBookingCard("GYM 2", "50 %", "assets/gymuntar.heic"),
+              _buildBookingCard("GYM 2", "50 %", "assets/gymuntar.jpg"),
             ],
           ),
         ),
@@ -221,9 +221,9 @@ class _ExplorePageState extends State<ExplorePage> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildPopularCard("GYM 1", "Jakarta", "assets/gymuntar.heic", "6:00 PM", "John"),
-              _buildPopularCard("GYM 2", "Jakarta", "assets/gymuntar.heic", "7:00 PM", "John"),
-              _buildPopularCard("GYM 3", "Jakarta", "assets/gymuntar.heic", "7:00 PM", "John"),
+              _buildPopularCard("GYM 1", "Jakarta", "assets/gymuntar.jpg", "6:00 PM", "John"),
+              _buildPopularCard("GYM 2", "Jakarta", "assets/gymuntar.jpg", "7:00 PM", "John"),
+              _buildPopularCard("GYM 3", "Jakarta", "assets/gymuntar.jpg", "7:00 PM", "John"),
             ],
           ),
         ),
