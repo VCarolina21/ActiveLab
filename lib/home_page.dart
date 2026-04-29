@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'notif_page.dart';
+import 'explore_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -8,7 +9,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: _buildBottomNav(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -192,6 +193,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  // 4. Explore Section
   Widget _buildExploreSection() {
     return Column(
       children: [
@@ -296,12 +298,21 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNav() {
+  Widget _buildBottomNav(BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
+      currentIndex: 0, // Posisi di Home
       selectedItemColor: const Color(0xFF4285F4),
       unselectedItemColor: Colors.grey,
       showUnselectedLabels: true,
+      onTap: (index) {
+        if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ExplorePage()),
+          );
+        }
+      },
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
         BottomNavigationBarItem(icon: Icon(Icons.search), label: "Explore"),

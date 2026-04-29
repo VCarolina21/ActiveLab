@@ -14,7 +14,7 @@ class RealLoginPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF90CAF9), Color(0xFF4285F4)], // Tetap warna biru awal
+            colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
           ),
         ),
         child: Column(
