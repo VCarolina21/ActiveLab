@@ -84,8 +84,8 @@ class _RealLoginPageState extends State<RealLoginPage> {
                     Center(
                       child: Image.asset(
                         'assets/logoactivelab.png',
-                        width: 280,
-                        height: 230,
+                        width: 400,
+                        height: 250,
                         fit: BoxFit.contain,
                       ),
                     ),
