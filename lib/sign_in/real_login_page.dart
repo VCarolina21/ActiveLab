@@ -77,8 +77,8 @@ class _RealLoginPageState extends State<RealLoginPage> {
               Center(
                 child: Image.asset(
                   'assets/logoactivelab.png',
-                  width: 250,
-                  height: 250,
+                  width: 400,
+                  height: 300,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => const Column(
                     children: [
