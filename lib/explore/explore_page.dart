@@ -15,24 +15,36 @@ class _ExplorePageState extends State<ExplorePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       bottomNavigationBar: _buildBottomNav(context),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              _buildHeader(),
-              const SizedBox(height: 20),
-              _buildSearchBar(),
-              const SizedBox(height: 25),
-              _buildLastBooking(),
-              const SizedBox(height: 25),
-              _buildMentorSection(),
-              const SizedBox(height: 25),
-              _buildPopularGymSection(),
-              const SizedBox(height: 20),
-            ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFE3F2FD), Colors.white],
+            stops: [0.0, 0.4],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                _buildHeader(),
+                const SizedBox(height: 20),
+                _buildSearchBar(),
+                const SizedBox(height: 25),
+                _buildLastBooking(),
+                const SizedBox(height: 25),
+                _buildMentorSection(),
+                const SizedBox(height: 25),
+                _buildPopularGymSection(),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -44,14 +56,14 @@ class _ExplorePageState extends State<ExplorePage> {
       children: [
         const CircleAvatar(
           radius: 22,
-          backgroundColor: Color(0xFFE0E0E0),
+          backgroundColor: Colors.white,
           child: Icon(Icons.person, color: Colors.black),
         ),
         const SizedBox(width: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Hello !", style: TextStyle(color: Colors.grey, fontSize: 13)),
+            const Text("Hello !", style: TextStyle(color: Colors.blueGrey, fontSize: 13)),
             Text(
               widget.userName.isNotEmpty ? widget.userName : "User", 
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
@@ -66,8 +78,15 @@ class _ExplorePageState extends State<ExplorePage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: const TextField(
         decoration: InputDecoration(
@@ -82,6 +101,7 @@ class _ExplorePageState extends State<ExplorePage> {
 
   Widget _buildLastBooking() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,6 +134,13 @@ class _ExplorePageState extends State<ExplorePage> {
       height: 90,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 10, 
+            offset: const Offset(0, 4)
+          )
+        ],
         image: DecorationImage(
           image: AssetImage(imagePath),
           fit: BoxFit.cover,
@@ -176,14 +203,18 @@ class _ExplorePageState extends State<ExplorePage> {
         const SizedBox(height: 15),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildMentorAvatar("Apes", "assets/coachcowo.JPG"),
-              _buildMentorAvatar("John", "assets/coachcewe.JPG"),
-              _buildMentorAvatar("Rudy", "assets/coachcowo.JPG"),
-              _buildMentorAvatar("Kucing", "assets/coachcewe.JPG"),
-              _buildMentorAvatar("Imut", "assets/coachcowo.JPG"),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              children: [
+                _buildMentorAvatar("Crystal", "assets/coachcewe.JPG"),
+                _buildMentorAvatar("Garry", "assets/coachcowo.JPG"),
+                _buildMentorAvatar("Jessica", "assets/coachcewe.JPG"),
+                _buildMentorAvatar("Karl", "assets/coachcowo.JPG"),
+                _buildMentorAvatar("Sofia", "assets/coachcewe.JPG"),
+                _buildMentorAvatar("Woody", "assets/coachcowo.JPG"),
+              ],
+            ),
           ),
         ),
       ],
@@ -195,7 +226,23 @@ class _ExplorePageState extends State<ExplorePage> {
       padding: const EdgeInsets.only(right: 20),
       child: Column(
         children: [
-          CircleAvatar(radius: 30, backgroundImage: AssetImage(imagePath)),
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 30, 
+              backgroundColor: Colors.white,
+              backgroundImage: AssetImage(imagePath)
+            ),
+          ),
           const SizedBox(height: 8),
           Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
         ],
@@ -205,25 +252,17 @@ class _ExplorePageState extends State<ExplorePage> {
 
   Widget _buildPopularGymSection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Most Popular GYM", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            TextButton(
-              onPressed: () {},
-              child: const Text("See All", style: TextStyle(color: Color(0xFF4285F4))),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
+        const Text("Most Popular At GYM", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        const SizedBox(height: 15),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildPopularCard("GYM 1", "Jakarta", "assets/gymuntar.jpg", "6:00 PM", "John"),
-              _buildPopularCard("GYM 2", "Jakarta", "assets/gymuntar.jpg", "7:00 PM", "John"),
-              _buildPopularCard("GYM 3", "Jakarta", "assets/gymuntar.jpg", "7:00 PM", "John"),
+              _buildPopularCard("GYM", "CoreFit Gym", "Jakarta Selatan", "assets/gymuntar.jpg", "6:00 PM", "180", "Garry"),
+              _buildPopularCard("PILATES", "MoveFit Pilates", "Jakarta Barat", "assets/pilates.JPG", "7:00 PM", "120", "Jessica"),
+              _buildPopularCard("YOGA", "FlexFit Yoga", "Jakarta Pusat", "assets/yoga.JPG", "7:00 PM", "90", "Sofia"),
             ],
           ),
         ),
@@ -231,11 +270,21 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  Widget _buildPopularCard(String name, String loc, String imagePath, String time, String coach) {
+  Widget _buildPopularCard(String category, String name, String loc, String imagePath, String time, String duration, String coach) {
     return Container(
       width: 220, 
       height: 320, 
-      margin: const EdgeInsets.only(right: 15),
+      margin: const EdgeInsets.only(right: 15, bottom: 15), 
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
         child: Stack(
@@ -260,14 +309,14 @@ class _ExplorePageState extends State<ExplorePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("SPA", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
+                  Text(category, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
                   const SizedBox(height: 5),
                   Text("$name, $loc", style: const TextStyle(color: Colors.white70, fontSize: 13)),
                   const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("$time | 60\nMins", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                      Text("$time | $duration\nMins", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
                       Text(coach, style: const TextStyle(color: Colors.white, fontSize: 14)),
                     ],
                   ),
