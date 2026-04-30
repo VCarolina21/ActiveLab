@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
     {"name": "ActiveFit Yoga", "loc": "Jakarta Utara", "type": "Yoga", "img": "assets/yoga.JPG"},
     {"name": "ActiveFit Massage", "loc": "Jakarta Utara", "type": "Massage", "img": "assets/massage.JPG"},
     {"name": "ActiveFit Physiotherapy", "loc": "Jakarta Utara", "type": "Fisioterapi", "img": "assets/fisioterapi.JPG"},
-    {"name": "ActiveFit HIIT", "loc": "Jakarta Utara", "type": "HIIT", "img": "assets/hiit.JPG"},
+    {"name": "ActiveFit Hiit", "loc": "Jakarta Utara", "type": "HIIT", "img": "assets/hiit.JPG"},
 
     {"name": "MoveFit Gym", "loc": "Jakarta Barat", "type": "Gym", "img": "assets/gymuntar.jpg"},
     {"name": "MoveFit Spa", "loc": "Jakarta Barat", "type": "Spa", "img": "assets/spa.JPG"},
@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
     {"name": "MoveFit Yoga", "loc": "Jakarta Barat", "type": "Yoga", "img": "assets/yoga.JPG"},
     {"name": "MoveFit Massage", "loc": "Jakarta Barat", "type": "Massage", "img": "assets/massage.JPG"},
     {"name": "MoveFit Physiotherapy", "loc": "Jakarta Barat", "type": "Fisioterapi", "img": "assets/fisioterapi.JPG"},
-    {"name": "MoveFit HIIT", "loc": "Jakarta Barat", "type": "HIIT", "img": "assets/hiit.JPG"},
+    {"name": "MoveFit Hiit", "loc": "Jakarta Barat", "type": "HIIT", "img": "assets/hiit.JPG"},
 
     {"name": "FlexFit Gym", "loc": "Jakarta Pusat", "type": "Gym", "img": "assets/gymuntar.jpg"},
     {"name": "FlexFit Spa", "loc": "Jakarta Pusat", "type": "Spa", "img": "assets/spa.JPG"},
@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
     {"name": "FlexFit Yoga", "loc": "Jakarta Pusat", "type": "Yoga", "img": "assets/yoga.JPG"},
     {"name": "FlexFit Massage", "loc": "Jakarta Pusat", "type": "Massage", "img": "assets/massage.JPG"},
     {"name": "FlexFit Physiotherapy", "loc": "Jakarta Pusat", "type": "Fisioterapi", "img": "assets/fisioterapi.JPG"},
-    {"name": "FlexFit HIIT", "loc": "Jakarta Pusat", "type": "HIIT", "img": "assets/hiit.JPG"},
+    {"name": "FlexFit Hiit", "loc": "Jakarta Pusat", "type": "HIIT", "img": "assets/hiit.JPG"},
 
     {"name": "CoreFit Gym", "loc": "Jakarta Selatan", "type": "Gym", "img": "assets/gymuntar.jpg"},
     {"name": "CoreFit Spa", "loc": "Jakarta Selatan", "type": "Spa", "img": "assets/spa.JPG"},
@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
     {"name": "CoreFit Yoga", "loc": "Jakarta Selatan", "type": "Yoga", "img": "assets/yoga.JPG"},
     {"name": "CoreFit Massage", "loc": "Jakarta Selatan", "type": "Massage", "img": "assets/massage.JPG"},
     {"name": "CoreFit Physiotherapy", "loc": "Jakarta Selatan", "type": "Fisioterapi", "img": "assets/fisioterapi.JPG"},
-    {"name": "CoreFit HIIT", "loc": "Jakarta Selatan", "type": "HIIT", "img": "assets/hiit.JPG"},
+    {"name": "CoreFit Hiit", "loc": "Jakarta Selatan", "type": "HIIT", "img": "assets/hiit.JPG"},
   ];
 
   final List<String> categories = ["All", "Fisioterapi", "Gym", "HIIT", "Massage", "Pilates", "Spa", "Yoga"];
