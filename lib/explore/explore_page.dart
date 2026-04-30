@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'mentor_detail_page.dart';
+
 class ExplorePage extends StatefulWidget {
   final String userName;
 
@@ -222,30 +224,77 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
   Widget _buildMentorAvatar(String name, String imagePath) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 20),
-      child: Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.25),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: CircleAvatar(
-              radius: 30, 
-              backgroundColor: Colors.white,
-              backgroundImage: AssetImage(imagePath)
+    // Memilih gambar detail yang berbeda (Full Body)
+    String detailImage = imagePath.toLowerCase().contains("cewe") 
+        ? "assets/mentorcewe.png" 
+        : "assets/mentorcowo.png";
+
+    String exp = "5 Years";
+    String age = "25";
+    String work = "Fit Studio";
+    String about = "Certified instructor dedicated to helping you reach your fitness goals.";
+
+    if (name == "Garry") {
+      exp = "8 Years"; age = "30"; work = "CoreFit Gym";
+      about = "Expert in high-intensity muscle building and strength conditioning at CoreFit. Garry focuses on proper form and powerlifting techniques.";
+    } else if (name == "Jessica") {
+      exp = "6 Years"; age = "28"; work = "MoveFit Pilates";
+      about = "Specializes in clinical pilates and core stability. Jessica helps clients improve flexibility and posture through mindful movement.";
+    } else if (name == "Sofia") {
+      exp = "10 Years"; age = "32"; work = "FlexFit Yoga";
+      about = "A master of Vinyasa and Hatha Yoga. Sofia integrates mental wellness with physical strength, guiding students through a holistic journey.";
+    } else if (name == "Crystal") {
+      exp = "4 Years"; age = "24"; work = "Elite Fitness";
+      about = "Passionate about cardio and fat-loss programs. Crystal's energetic approach makes every workout session feel like a new challenge.";
+    } else if (name == "Karl") {
+      exp = "12 Years"; age = "35"; work = "Iron Paradise";
+      about = "Former professional athlete. Karl brings a competitive edge to training, specializing in endurance and performance.";
+    } else if (name == "Woody") {
+      exp = "7 Years"; age = "29"; work = "Body Mechanics";
+      about = "Focuses on functional training and injury recovery. Woody ensures your body moves correctly so you can stay active for life.";
+    }
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MentorDetailPage(
+              name: name,
+              imagePath: detailImage,
+              experience: exp,
+              age: age,
+              workPlace: work,
+              about: about,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-        ],
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(right: 20),
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 30, 
+                backgroundColor: Colors.white,
+                backgroundImage: AssetImage(imagePath)
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+          ],
+        ),
       ),
     );
   }
@@ -260,9 +309,9 @@ class _ExplorePageState extends State<ExplorePage> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildPopularCard("GYM", "CoreFit Gym", "Jakarta Selatan", "assets/gymuntar.jpg", "6:00 PM", "180", "Garry"),
-              _buildPopularCard("PILATES", "MoveFit Pilates", "Jakarta Barat", "assets/pilates.JPG", "7:00 PM", "120", "Jessica"),
-              _buildPopularCard("YOGA", "FlexFit Yoga", "Jakarta Pusat", "assets/yoga.JPG", "7:00 PM", "90", "Sofia"),
+              _buildPopularCard("GYM", "CoreFit Gym", "Jakarta Selatan", "assets/gymuntar.jpg", "6:00 PM", "60", "Garry"),
+              _buildPopularCard("PILATES", "MoveFit Pilates", "Jakarta Barat", "assets/pilates.JPG", "7:00 PM", "45", "Jessica"),
+              _buildPopularCard("YOGA", "FlexFit Yoga", "Jakarta Pusat", "assets/yoga.JPG", "7:00 PM", "50", "Sofia"),
             ],
           ),
         ),
