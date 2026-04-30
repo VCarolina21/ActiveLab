@@ -241,22 +241,33 @@ class _HomePageState extends State<HomePage> {
 
     return Container(
       padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))]),
-      child: Column(children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      decoration: BoxDecoration(
+        color: Colors.white, 
+        borderRadius: BorderRadius.circular(20), 
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2), 
+            blurRadius: 20, 
+            offset: const Offset(0, 8)
+          )
+        ]
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           const Text("WEEKLY TARGET", style: TextStyle(fontWeight: FontWeight.bold)),
-          IconButton(icon: const Icon(Icons.ios_share, size: 18), onPressed: () {}),
-        ]),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, 
-          children: List.generate(7, (i) {
-            int dayNumber = i + 1;
-            bool isReached = dayNumber <= currentStreak;
-            bool showFire = dayNumber == currentStreak;
-            return _dayCircle(isReached, dayNumber, showFire);
-          }),
-        ),
-      ]),
+          const SizedBox(height: 15), // Spacing between title and circles
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+            children: List.generate(7, (i) {
+              int dayNumber = i + 1;
+              bool isReached = dayNumber <= currentStreak;
+              bool showFire = dayNumber == currentStreak;
+              return _dayCircle(isReached, dayNumber, showFire);
+            }),
+          ),
+        ]
+      ),
     );
   }
 
