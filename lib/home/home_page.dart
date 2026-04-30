@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
     {"name": "CoreFit Hiit", "loc": "Jakarta Selatan", "type": "HIIT", "img": "assets/hiit.JPG"},
   ];
 
-  final List<String> categories = ["All", "Fisioterapi", "Gym", "HIIT", "Massage", "Pilates", "Spa", "Yoga"];
+  final List<String> categories = ["All", "Physiotherapy", "Gym", "Hiit", "Massage", "Pilates", "Spa", "Yoga"];
 
   @override
   void initState() {
@@ -72,8 +72,14 @@ class _HomePageState extends State<HomePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFE3F2FD), Colors.white],
-            stops: [0.0, 0.4],
+
+            colors: [
+              Color(0xFF0D47A1),
+              Color(0xFF42A5F5),
+              Color(0xFFB3E5FC),
+              Colors.white,
+            ],
+            stops: [0.0, 0.25, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
@@ -189,8 +195,8 @@ class _HomePageState extends State<HomePage> {
         const CircleAvatar(radius: 25, backgroundColor: Colors.white, child: Icon(Icons.person, color: Colors.black)),
         const SizedBox(width: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text("Hello !", style: TextStyle(color: Colors.blueGrey, fontSize: 14)),
-          Text(widget.userName.isNotEmpty ? widget.userName : "User", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 14)), // Diubah ke putih transparan agar kontras dengan biru
+          Text(widget.userName.isNotEmpty ? widget.userName : "User", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)), // Diubah ke putih
         ]),
         const Spacer(),
         GestureDetector(
@@ -256,7 +262,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text("WEEKLY TARGET", style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 15), // Spacing between title and circles
+          const SizedBox(height: 15), 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween, 
             children: List.generate(7, (i) {

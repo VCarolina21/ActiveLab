@@ -9,17 +9,21 @@ class NotifPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+
           Container(
-            height: MediaQuery.of(context).size.height * 0.85, 
+            width: double.infinity,
+            height: double.infinity,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFFBBDEFB),
+                  Color(0xFF0D47A1),
+                  Color(0xFF42A5F5),
+                  Color(0xFFB3E5FC),
                   Colors.white,
                 ],
-                stops: [0.0, 0.9], 
+                stops: [0.0, 0.25, 0.5, 1.0], 
               ),
             ),
           ),
@@ -36,7 +40,7 @@ class NotifPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.black12),
                           borderRadius: BorderRadius.circular(12),
-                          color: Colors.white,
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                         child: IconButton(
                           icon: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
@@ -50,7 +54,7 @@ class NotifPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                       ),

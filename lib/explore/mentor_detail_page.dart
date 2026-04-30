@@ -71,9 +71,9 @@ class MentorDetailPage extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: Image.asset(imagePath, fit: BoxFit.contain, alignment: Alignment.bottomCenter),
+                    child: Image.asset(imagePath, fit: BoxFit.cover, alignment: Alignment.topCenter),
                   ),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 11),
                 ],
               ),
             ),

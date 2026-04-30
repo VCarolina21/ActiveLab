@@ -24,8 +24,13 @@ class _ExplorePageState extends State<ExplorePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFE3F2FD), Colors.white],
-            stops: [0.0, 0.4],
+            colors: [
+              Color(0xFF0D47A1),
+              Color(0xFF42A5F5),
+              Color(0xFFB3E5FC),
+              Colors.white,
+            ],
+            stops: [0.0, 0.25, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
@@ -65,10 +70,10 @@ class _ExplorePageState extends State<ExplorePage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Hello !", style: TextStyle(color: Colors.blueGrey, fontSize: 13)),
+            const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 13)),
             Text(
               widget.userName.isNotEmpty ? widget.userName : "User", 
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
             ),
           ],
         ),
@@ -108,10 +113,10 @@ class _ExplorePageState extends State<ExplorePage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text("Last Booking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text("Last Booking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
             TextButton(
               onPressed: () {},
-              child: const Text("See All", style: TextStyle(color: Color(0xFF4285F4))),
+              child: const Text("See All", style: TextStyle(color: Colors.white70)),
             ),
           ],
         ),
@@ -224,7 +229,6 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
   Widget _buildMentorAvatar(String name, String imagePath) {
-    // Memilih gambar detail yang berbeda (Full Body)
     String detailImage = imagePath.toLowerCase().contains("cewe") 
         ? "assets/mentorcewe.png" 
         : "assets/mentorcowo.png";
