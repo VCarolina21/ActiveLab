@@ -15,10 +15,12 @@ class _InterestPageState extends State<InterestPage> {
   final List<String> _interests = [
     "Spa",
     "Strength Training",
+    "Hiit",
     "Pilates",
     "Plunge Pool",
     "Gym",
     "Cardio",
+    "Calisthenics",
     "Physiotherapy",
     "Personal Training"
   ];
