@@ -4,6 +4,7 @@ import 'dart:math';
 import 'notif_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
+import '../profile/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   final String userName;
@@ -295,6 +296,8 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName))); 
         } else if (index == 2) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage()));
+        } else if (index == 3) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
         }
       },
       items: const [

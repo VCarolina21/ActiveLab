@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'mentor_detail_page.dart';
 import '../chat/chat_page.dart';
+import '../profile/profile_page.dart';
 
 class ExplorePage extends StatefulWidget {
   final String userName;
@@ -395,6 +396,8 @@ class _ExplorePageState extends State<ExplorePage> {
           Navigator.pop(context);
         } else if (index == 2) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage()));
+        } else if (index == 3) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
         }
       },
       items: const [
