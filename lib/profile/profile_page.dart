@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../home/home_page.dart';
+import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -200,7 +203,10 @@ class ProfilePage extends StatelessWidget {
         if (index == 0 || index == 1) {
           Navigator.pop(context);
         } else if (index == 2) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage()));
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => ChatPage(userName: userName))
+          );
         }
       },
       child: Column(

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'chat_detail_page.dart';
+import '../profile/profile_page.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  final String userName;
+  const ChatPage({super.key, required this.userName});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -101,6 +104,24 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      bottomNavigationBar: _buildBottomNav(context),
+      floatingActionButton: SizedBox(
+        width: 60,
+        height: 60,
+        child: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: Colors.white,
+          elevation: 4,
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.crop_free,
+            color: Colors.black,
+            size: 30,
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -119,26 +140,21 @@ class _ChatPageState extends State<ChatPage> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Message",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                    const Text(
-                      "Message",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               _buildSearchBar(),
               const SizedBox(height: 25),
               Expanded(
@@ -151,7 +167,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                   child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                    padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 100),
                     itemCount: chats.length,
                     separatorBuilder: (context, index) => const Divider(
                       color: Color(0xFFF5F5F5),
@@ -267,6 +283,69 @@ class _ChatPageState extends State<ChatPage> {
                 style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNav(BuildContext context) {
+    return BottomAppBar(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      height: 70,
+      shape: const CircularNotchedRectangle(),
+      notchMargin: 8.0,
+      color: Colors.white,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _navItem(context, Icons.home_filled, "Home", false, 0),
+              _navItem(context, Icons.search, "Explore", false, 1),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _navItem(context, Icons.chat_bubble, "Chat", true, 2),
+              _navItem(context, Icons.person_outline, "Profile", false, 3),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _navItem(BuildContext context, IconData icon, String label, bool isActive, int index) {
+    return MaterialButton(
+      minWidth: 40,
+      onPressed: () {
+        if (isActive) return;
+        if (index == 0 || index == 1) {
+          Navigator.pop(context);
+        } else if (index == 3) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfilePage(userName: widget.userName),
+            ),
+          );
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: isActive ? const Color(0xFF4285F4) : Colors.grey),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isActive ? const Color(0xFF4285F4) : Colors.grey,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );

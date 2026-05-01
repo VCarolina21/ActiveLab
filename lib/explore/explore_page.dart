@@ -17,8 +17,25 @@ class _ExplorePageState extends State<ExplorePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: Colors.white,
       bottomNavigationBar: _buildBottomNav(context),
+      floatingActionButton: SizedBox(
+        width: 60,
+        height: 60,
+        child: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: Colors.white,
+          elevation: 4,
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.crop_free,
+            color: Colors.black,
+            size: 30,
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -51,7 +68,7 @@ class _ExplorePageState extends State<ExplorePage> {
                 _buildMentorSection(),
                 const SizedBox(height: 25),
                 _buildPopularGymSection(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -385,27 +402,70 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
+  // PERBAIKAN: Bottom Nav diganti menjadi BottomAppBar agar seragam & fungsional
   Widget _buildBottomNav(BuildContext context) {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      currentIndex: 1,
-      selectedItemColor: const Color(0xFF4285F4),
-      unselectedItemColor: Colors.grey,
-      onTap: (index) {
+    return BottomAppBar(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      height: 70,
+      shape: const CircularNotchedRectangle(),
+      notchMargin: 12.0,
+      color: Colors.white,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _navItem(context, Icons.home_filled, "Home", false, 0),
+              _navItem(context, Icons.search, "Explore", true, 1),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _navItem(context, Icons.chat_bubble_outline, "Chat", false, 2),
+              _navItem(context, Icons.person_outline, "Profile", false, 3),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _navItem(BuildContext context, IconData icon, String label, bool isActive, int index) {
+    return MaterialButton(
+      minWidth: 40,
+      onPressed: () {
+        if (isActive) return;
         if (index == 0) {
           Navigator.pop(context);
         } else if (index == 2) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage()));
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName))
+          );
         } else if (index == 3) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName))
+          );
         }
       },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: "Explore"),
-        BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: "Chat"),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "Profile"),
-      ],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: isActive ? const Color(0xFF4285F4) : Colors.grey),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isActive ? const Color(0xFF4285F4) : Colors.grey,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
