@@ -54,7 +54,7 @@ class ChatDetailPage extends StatelessWidget {
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(locationName, style: const TextStyle(fontWeight: FontWeight.bold)),
           Text(locationType, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-          const Text("Rp 12.000 /Hour", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+          const Text("Rp 25.000 /Hour", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
         ])),
         const Icon(Icons.star, color: Colors.amber, size: 18),
         const Text(" 5", style: TextStyle(fontWeight: FontWeight.bold)),
