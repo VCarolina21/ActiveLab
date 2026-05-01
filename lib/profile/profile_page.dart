@@ -179,7 +179,7 @@ class ProfilePage extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _navItem(context, Icons.home_filled, "Home", false, 0),
+              _navItem(context, Icons.home_outlined, "Home", false, 0),
               _navItem(context, Icons.search, "Explore", false, 1),
             ],
           ),
@@ -200,10 +200,18 @@ class ProfilePage extends StatelessWidget {
       minWidth: 40,
       onPressed: () {
         if (isActive) return;
-        if (index == 0 || index == 1) {
-          Navigator.pop(context);
+        if (index == 0) {
+          Navigator.pushReplacement(
+            context, 
+            MaterialPageRoute(builder: (context) => HomePage(userName: userName))
+          );
+        } else if (index == 1) {
+          Navigator.pushReplacement(
+            context, 
+            MaterialPageRoute(builder: (context) => ExplorePage(userName: userName))
+          );
         } else if (index == 2) {
-          Navigator.push(
+          Navigator.pushReplacement(
             context, 
             MaterialPageRoute(builder: (context) => ChatPage(userName: userName))
           );
