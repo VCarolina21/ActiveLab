@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'mentor_detail_page.dart';
+import '../chat/chat_page.dart';
 
 class ExplorePage extends StatefulWidget {
   final String userName;
@@ -390,7 +391,11 @@ class _ExplorePageState extends State<ExplorePage> {
       selectedItemColor: const Color(0xFF4285F4),
       unselectedItemColor: Colors.grey,
       onTap: (index) {
-        if (index == 0) Navigator.pop(context);
+        if (index == 0) {
+          Navigator.pop(context);
+        } else if (index == 2) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage()));
+        }
       },
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
