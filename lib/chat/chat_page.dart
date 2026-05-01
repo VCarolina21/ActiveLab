@@ -9,7 +9,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // Daftar 6 Mentor Lengkap
   final List<Map<String, dynamic>> chats = [
     {
       "name": "Crystal (CoreFit Gym)",
