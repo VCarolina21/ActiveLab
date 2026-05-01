@@ -315,8 +315,8 @@ class _ExplorePageState extends State<ExplorePage> {
             children: [
               _buildPopularCard("GYM", "CoreFit Gym", "Jakarta Selatan", "assets/gymuntar.jpg", "6:00 PM", "60", "Garry"),
               _buildPopularCard("PILATES", "MoveFit Pilates", "Jakarta Barat", "assets/pilates.JPG", "7:00 PM", "45", "Jessica"),
-              _buildPopularCard("YOGA", "FlexFit Yoga", "Jakarta Pusat", "assets/yoga.JPG", "7:00 PM", "50", "Sofia"),
               _buildPopularCard("Physiotherapy", "ActiveFit Physiotherapy", "Jakarta Utara", "assets/fisioterapi.JPG", "2:00 PM", "30", "Karl"),
+              _buildPopularCard("YOGA", "FlexFit Yoga", "Jakarta Pusat", "assets/yoga.JPG", "7:00 PM", "50", "Sofia"),
             ],
           ),
         ),

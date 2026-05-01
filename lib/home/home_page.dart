@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'notif_page.dart';
 import '../explore/explore_page.dart';
+import '../chat/chat_page.dart';
 
 class HomePage extends StatefulWidget {
   final String userName;
@@ -326,7 +327,13 @@ class _HomePageState extends State<HomePage> {
       currentIndex: 0,
       selectedItemColor: const Color(0xFF4285F4),
       unselectedItemColor: Colors.grey,
-      onTap: (index) { if (index == 1) Navigator.push(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName))); },
+      onTap: (index) { 
+        if (index == 1) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName))); 
+        } else if (index == 2) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatPage()));
+        }
+      },
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
         BottomNavigationBarItem(icon: Icon(Icons.search), label: "Explore"),
