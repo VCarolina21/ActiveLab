@@ -73,7 +73,6 @@ class _HomePageState extends State<HomePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-
             colors: [
               Color(0xFF0D47A1),
               Color(0xFF42A5F5),
@@ -196,8 +195,8 @@ class _HomePageState extends State<HomePage> {
         const CircleAvatar(radius: 25, backgroundColor: Colors.white, child: Icon(Icons.person, color: Colors.black)),
         const SizedBox(width: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 14)), // Diubah ke putih transparan agar kontras dengan biru
-          Text(widget.userName.isNotEmpty ? widget.userName : "User", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)), // Diubah ke putih
+          const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 14)),
+          Text(widget.userName.isNotEmpty ? widget.userName : "User", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
         ]),
         const Spacer(),
         GestureDetector(
@@ -229,8 +228,8 @@ class _HomePageState extends State<HomePage> {
               const Text("40% complete", style: TextStyle(color: Colors.white, fontSize: 12)),
               const SizedBox(height: 5),
               _progressBar(),
-              const Text("DAY 3", style: TextStyle(color: Colors.white, fontSize: 60, fontWeight: FontWeight.w900, shadows: [Shadow(color: Colors.black38, blurRadius: 12, offset: Offset(2, 2))])),
-              ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF1976D2), elevation: 8), child: const Text("START")),
+              const Text("DAY 3", style: TextStyle(color: Colors.white, fontSize: 60, fontWeight: FontWeight.w900)),
+              ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF1976D2)), child: const Text("START")),
             ])),
           ]),
         ),
@@ -245,20 +244,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildWeeklyTarget() {
     int currentStreak = 3;
-
     return Container(
       padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white, 
-        borderRadius: BorderRadius.circular(20), 
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2), 
-            blurRadius: 20, 
-            offset: const Offset(0, 8)
-          )
-        ]
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -268,9 +256,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween, 
             children: List.generate(7, (i) {
               int dayNumber = i + 1;
-              bool isReached = dayNumber <= currentStreak;
-              bool showFire = dayNumber == currentStreak;
-              return _dayCircle(isReached, dayNumber, showFire);
+              return _dayCircle(dayNumber <= currentStreak, dayNumber, dayNumber == currentStreak);
             }),
           ),
         ]
@@ -284,39 +270,16 @@ class _HomePageState extends State<HomePage> {
       clipBehavior: Clip.none,
       children: [
         Container(
-          width: 35, 
-          height: 35, 
+          width: 35, height: 35, 
           decoration: BoxDecoration(
             shape: BoxShape.circle, 
             color: isReached ? const Color(0xFFE3F2FD) : Colors.transparent, 
             border: Border.all(color: isReached ? const Color(0xFF4285F4) : Colors.grey[300]!)
           ),
-          child: Center(
-            child: Text(
-              "$day", 
-              style: TextStyle(
-                color: isReached ? const Color(0xFF4285F4) : Colors.grey, 
-                fontWeight: isReached ? FontWeight.bold : FontWeight.normal
-              )
-            )
-          ),
+          child: Center(child: Text("$day", style: TextStyle(color: isReached ? const Color(0xFF4285F4) : Colors.grey, fontWeight: isReached ? FontWeight.bold : FontWeight.normal))),
         ),
         if (showFire)
-          Positioned(
-            top: -12,
-            right: -5,
-            child: Icon(
-              Icons.local_fire_department_rounded,
-              color: const Color(0xFF4285F4),
-              size: 20,
-              shadows: [
-                Shadow(
-                  color: const Color(0xFF4285F4).withValues(alpha: 0.4),
-                  blurRadius: 10,
-                )
-              ],
-            ),
-          ),
+          const Positioned(top: -12, right: -5, child: Icon(Icons.local_fire_department_rounded, color: Color(0xFF4285F4), size: 20)),
       ],
     );
   }

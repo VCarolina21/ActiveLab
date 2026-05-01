@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'chat_detail_page.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -8,48 +9,93 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  // Daftar 6 Mentor Lengkap
   final List<Map<String, dynamic>> chats = [
+    {
+      "name": "Crystal (CoreFit Gym)",
+      "msg": "Don't forget your protein intake!",
+      "time": "10:15 Am",
+      "unread": 1,
+      "img": "assets/coachcewe.JPG",
+      "locationName": "CoreFit Gym",
+      "locationType": "Gym & Fitness",
+      "locationImg": "assets/gymuntar.jpg",
+      "messages": [
+        {"text": "Hi Crystal, what should I eat after workout?", "isMe": true, "time": "10:00 AM"},
+        {"text": "Don't forget your protein intake!", "isMe": false, "time": "10:15 AM"},
+      ]
+    },
     {
       "name": "Garry (CoreFit Gym)",
       "msg": "Thank you! 😄",
       "time": "7:12 Am",
-      "unread": 3,
-      "img": "assets/coachcowo.JPG"
+      "unread": 0,
+      "img": "assets/coachcowo.JPG",
+      "locationName": "CoreFit Gym",
+      "locationType": "Gym & Fitness",
+      "locationImg": "assets/gymuntar.jpg",
+      "messages": [
+        {"text": "Hi Garry, is the weightlifting area open?", "isMe": true, "time": "7:00 AM"},
+        {"text": "Yes, it is! We just added new plates.", "isMe": false, "time": "7:05 AM"},
+        {"text": "Thank you! 😄", "isMe": false, "time": "7:12 AM"},
+      ]
     },
     {
-      "name": "Jessica (MoveFit)",
+      "name": "Jessica (CoreFit Pilates)",
       "msg": "Yes! please take a order",
       "time": "9:28 Am",
       "unread": 0,
-      "img": "assets/coachcewe.JPG"
+      "img": "assets/coachcewe.JPG",
+      "locationName": "CoreFit Pilates",
+      "locationType": "Pilates",
+      "locationImg": "assets/pilates.JPG",
+      "messages": [
+        {"text": "Can I book a Pilates session?", "isMe": true, "time": "9:10 AM"},
+        {"text": "Yes! please take a order.", "isMe": false, "time": "9:28 AM"},
+      ]
     },
     {
       "name": "Karl (ActiveFit Physiotherapy)",
-      "msg": "I think this one is good",
-      "time": "4:35 Pm",
-      "unread": 0,
-      "img": "assets/coachcowo.JPG"
+      "msg": "How is your back feeling today?",
+      "time": "Yesterday",
+      "unread": 2,
+      "img": "assets/coachcowo.JPG",
+      "locationName": "ActiveFit Physio",
+      "locationType": "Physiotherapy",
+      "locationImg": "assets/fisioterapi.JPG",
+      "messages": [
+        {"text": "The session was great, Karl.", "isMe": true, "time": "Yesterday"},
+        {"text": "How is your back feeling today?", "isMe": false, "time": "Yesterday"},
+      ]
     },
     {
       "name": "Sofia (FlexFit Yoga)",
-      "msg": "Wow, this is really epic",
-      "time": "8:12 Pm",
+      "msg": "See you at the studio, Sofia.",
+      "time": "Yesterday",
       "unread": 0,
-      "img": "assets/coachcewe.JPG"
+      "img": "assets/coachcewe.JPG",
+      "locationName": "FlexFit Yoga",
+      "locationType": "Yoga",
+      "locationImg": "assets/yoga.JPG",
+      "messages": [
+        {"text": "Is the morning flow class still at 7?", "isMe": true, "time": "Yesterday"},
+        {"text": "Yes, same schedule!", "isMe": false, "time": "Yesterday"},
+        {"text": "See you at the studio, Sofia.", "isMe": true, "time": "Yesterday"},
+      ]
     },
     {
-      "name": "Woody (CoreFit Gym)",
-      "msg": "woohoooo",
-      "time": "yesterday",
+      "name": "Woody (MoveFit Gym)",
+      "msg": "Great progress on your deadlift!",
+      "time": "Monday",
       "unread": 0,
-      "img": "assets/coachcowo.JPG"
-    },
-        {
-      "name": "Crystal (EliteFit Gym)",
-      "msg": "omg, this is amazing",
-      "time": "10:22 Pm",
-      "unread": 0,
-      "img": "assets/coachcewe.JPG"
+      "img": "assets/coachcowo.JPG",
+      "locationName": "MoveFit Gym",
+      "locationType": "Gym & Fitness",
+      "locationImg": "assets/gymuntar.jpg",
+      "messages": [
+        {"text": "Coach, I hit a new PR today!", "isMe": true, "time": "Monday"},
+        {"text": "Great progress on your deadlift!", "isMe": false, "time": "Monday"},
+      ]
     },
   ];
 
@@ -57,8 +103,6 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -76,7 +120,6 @@ class _ChatPageState extends State<ChatPage> {
           child: Column(
             children: [
               const SizedBox(height: 10),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
@@ -96,14 +139,11 @@ class _ChatPageState extends State<ChatPage> {
                   ],
                 ),
               ),
-              
               const SizedBox(height: 20),
               _buildSearchBar(),
               const SizedBox(height: 25),
-              
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.only(top: 20),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -112,17 +152,13 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                   child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                     itemCount: chats.length,
                     separatorBuilder: (context, index) => const Divider(
                       color: Color(0xFFF5F5F5),
                       indent: 85,
-                      thickness: 1,
                     ),
-                    itemBuilder: (context, index) {
-                      final chat = chats[index];
-                      return _buildChatTile(chat);
-                    },
+                    itemBuilder: (context, index) => _buildChatTile(chats[index]),
                   ),
                 ),
               ),
@@ -154,7 +190,6 @@ class _ChatPageState extends State<ChatPage> {
             icon: Icon(Icons.search, color: Colors.black54),
             hintText: "Search...",
             border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.grey),
           ),
         ),
       ),
@@ -163,22 +198,53 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildChatTile(Map<String, dynamic> chat) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-      leading: CircleAvatar(
-        radius: 30,
-        backgroundImage: AssetImage(chat['img']),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatDetailPage(
+              name: chat['name'],
+              image: chat['img'],
+              history: chat['messages'],
+              locationName: chat['locationName'],
+              locationType: chat['locationType'],
+              locationImg: chat['locationImg'],
+            ),
+          ),
+        );
+      },
+      leading: Stack(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundImage: AssetImage(chat['img']),
+          ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 15,
+              height: 15,
+              decoration: BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+            ),
+          ),
+        ],
       ),
       title: Text(
         chat['name'],
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: Text(
-          chat['msg'],
-          style: const TextStyle(color: Colors.grey),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+      subtitle: Text(
+        chat['msg'],
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: chat['unread'] > 0 ? Colors.black87 : Colors.grey,
+          fontWeight: chat['unread'] > 0 ? FontWeight.w600 : FontWeight.normal,
         ),
       ),
       trailing: Column(
@@ -189,25 +255,19 @@ class _ChatPageState extends State<ChatPage> {
             chat['time'],
             style: const TextStyle(color: Colors.grey, fontSize: 12),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 5),
           if (chat['unread'] > 0)
             Container(
-              padding: const EdgeInsets.all(7),
+              padding: const EdgeInsets.all(6),
               decoration: const BoxDecoration(
-                color: Color(0xFFE91E63),
+                color: Color(0xFF4285F4),
                 shape: BoxShape.circle,
               ),
               child: Text(
                 chat['unread'].toString(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
-            )
-          else
-            const SizedBox(height: 24),
+            ),
         ],
       ),
     );
