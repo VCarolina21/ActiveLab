@@ -4,6 +4,7 @@ import '../home/home_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../sign_in/sign_page.dart';
+import 'legal_policy_page.dart';
 
 class ProfilePage extends StatelessWidget {
   final String userName;
@@ -23,7 +24,6 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Ikon Tanya Bulat
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -50,7 +50,6 @@ class ProfilePage extends StatelessWidget {
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 30),
-                // Tombol Log Out & Cancel
                 Row(
                   children: [
                     Expanded(
@@ -218,7 +217,17 @@ class ProfilePage extends StatelessWidget {
                       const SizedBox(height: 20),
                       _buildSectionTitle("Setup & Help"),
                       _buildMenuCard([
-                        _buildMenuItem(Icons.gavel_outlined, "Legal and Policies"),
+                        // 2. HUBUNGKAN KE HALAMAN LEGAL DISINI
+                        _buildMenuItem(
+                          Icons.gavel_outlined, 
+                          "Legal and Policies",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const LegalPolicyPage()),
+                            );
+                          },
+                        ),
                       ]),
                       const SizedBox(height: 40),
                       Padding(
@@ -355,7 +364,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title) {
+  Widget _buildMenuItem(IconData icon, String title, {VoidCallback? onTap}) {
     return ListTile(
       leading: Icon(icon, color: Colors.black87),
       title: Text(
@@ -363,7 +372,7 @@ class ProfilePage extends StatelessWidget {
         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 
