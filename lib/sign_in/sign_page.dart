@@ -125,7 +125,9 @@ class _SignPageState extends State<SignPage> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(builder: (context) => const RegisterPage()),
-                                          );
+                                          ).then((_) {
+                                            setState(() => _dragPosition = 0.0);
+                                          });
                                         } else {
                                           setState(() => _dragPosition = 0.0);
                                         }
@@ -158,6 +160,7 @@ class _SignPageState extends State<SignPage> {
 
                             Expanded(
                               child: InkWell(
+                                borderRadius: BorderRadius.circular(30),
                                 onTap: () {
                                   Navigator.push(
                                     context,

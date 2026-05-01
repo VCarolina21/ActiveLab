@@ -3,11 +3,106 @@ import 'package:flutter/material.dart';
 import '../home/home_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
+import '../sign_in/sign_page.dart';
 
 class ProfilePage extends StatelessWidget {
   final String userName;
 
   const ProfilePage({super.key, required this.userName});
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Ikon Tanya Bulat
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFFF06292), width: 4),
+                  ),
+                  child: const Icon(
+                    Icons.question_mark,
+                    size: 60,
+                    color: Color(0xFFF06292),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Are You Sure?",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Do you want to log out ?",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 30),
+                // Tombol Log Out & Cancel
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SignPage()),
+                            (route) => false,
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFFF06292)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text(
+                          "Log Out",
+                          style: TextStyle(color: Color(0xFFF06292), fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF303F9F),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +228,7 @@ class ProfilePage extends StatelessWidget {
                           height: 55,
                           child: OutlinedButton(
                             onPressed: () {
-                              Navigator.of(context).popUntil((route) => route.isFirst);
+                              _showLogoutDialog(context); // Panggil Dialog
                             },
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.red, width: 1.5),
@@ -201,20 +296,11 @@ class ProfilePage extends StatelessWidget {
       onPressed: () {
         if (isActive) return;
         if (index == 0) {
-          Navigator.pushReplacement(
-            context, 
-            MaterialPageRoute(builder: (context) => HomePage(userName: userName))
-          );
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(userName: userName)));
         } else if (index == 1) {
-          Navigator.pushReplacement(
-            context, 
-            MaterialPageRoute(builder: (context) => ExplorePage(userName: userName))
-          );
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: userName)));
         } else if (index == 2) {
-          Navigator.pushReplacement(
-            context, 
-            MaterialPageRoute(builder: (context) => ChatPage(userName: userName))
-          );
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: userName)));
         }
       },
       child: Column(
