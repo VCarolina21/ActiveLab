@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../home/home_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
@@ -7,10 +6,17 @@ import '../sign_in/sign_page.dart';
 import 'legal_policy_page.dart';
 import 'membership_page.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final String userName;
 
   const ProfilePage({super.key, required this.userName});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String membershipDuration = "12 Month";
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -104,6 +110,19 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  Future<void> _navigateToMembership(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MembershipPage()),
+    );
+
+    if (result != null && result is String) {
+      setState(() {
+        membershipDuration = result;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,7 +191,7 @@ class ProfilePage extends StatelessWidget {
                             ),
                             const SizedBox(height: 15),
                             Text(
-                              userName.isNotEmpty ? userName : "User",
+                              widget.userName.isNotEmpty ? widget.userName : "User",
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -191,14 +210,14 @@ class ProfilePage extends StatelessWidget {
                                 color: Colors.orangeAccent,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.emoji_events, color: Colors.white, size: 18),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.emoji_events, color: Colors.white, size: 18),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    "12 Month",
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    membershipDuration,
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -214,12 +233,7 @@ class ProfilePage extends StatelessWidget {
                         _buildMenuItem(
                           Icons.shopping_bag_outlined, 
                           "My Memberships",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const MembershipPage()),
-                            );
-                          },
+                          onTap: () => _navigateToMembership(context),
                         ),
                         _buildDivider(),
                         _buildMenuItem(Icons.account_balance_wallet_outlined, "Payment Methods"),
@@ -314,11 +328,11 @@ class ProfilePage extends StatelessWidget {
       onPressed: () {
         if (isActive) return;
         if (index == 0) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(userName: userName)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(userName: widget.userName)));
         } else if (index == 1) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: userName)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName)));
         } else if (index == 2) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: userName)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
         }
       },
       child: Column(

@@ -1,4 +1,4 @@
-import 'dart:ui'; // Penting untuk ImageFilter (blur)
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class MembershipPage extends StatefulWidget {
@@ -217,11 +217,8 @@ class _MembershipPageState extends State<MembershipPage> {
                         padding: const EdgeInsets.only(left: 20, top: 10),
                         child: InkWell(
                           onTap: () {
-                            setState(() {
-                              isPaymentSuccess = false;
-                              selectedIndex = -1;
-                              selectedPaymentIndex = -1;
-                            });
+                            // Mengirim data durasi yang dipilih balik ke ProfilePage
+                            Navigator.pop(context, membershipPlans[selectedIndex]['duration']);
                           },
                           child: Container(
                             padding: const EdgeInsets.all(10),
