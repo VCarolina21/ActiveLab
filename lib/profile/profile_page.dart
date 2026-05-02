@@ -168,7 +168,7 @@ class ProfilePage extends StatelessWidget {
                             const CircleAvatar(
                               radius: 60,
                               backgroundColor: Colors.white,
-                              backgroundImage: AssetImage('assets/coachcowo.JPG'),
+                              backgroundImage: AssetImage('assets/profile.JPG'),
                             ),
                             const SizedBox(height: 15),
                             Text(
