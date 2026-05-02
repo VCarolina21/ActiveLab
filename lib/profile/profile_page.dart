@@ -5,6 +5,7 @@ import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../sign_in/sign_page.dart';
 import 'legal_policy_page.dart';
+import 'membership_page.dart';
 
 class ProfilePage extends StatelessWidget {
   final String userName;
@@ -210,14 +211,22 @@ class ProfilePage extends StatelessWidget {
                       _buildMenuCard([
                         _buildMenuItem(Icons.calendar_today_outlined, "My Bookings"),
                         _buildDivider(),
-                        _buildMenuItem(Icons.shopping_bag_outlined, "My Memberships"),
+                        _buildMenuItem(
+                          Icons.shopping_bag_outlined, 
+                          "My Memberships",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const MembershipPage()),
+                            );
+                          },
+                        ),
                         _buildDivider(),
                         _buildMenuItem(Icons.account_balance_wallet_outlined, "Payment Methods"),
                       ]),
                       const SizedBox(height: 20),
                       _buildSectionTitle("Setup & Help"),
                       _buildMenuCard([
-                        // 2. HUBUNGKAN KE HALAMAN LEGAL DISINI
                         _buildMenuItem(
                           Icons.gavel_outlined, 
                           "Legal and Policies",
@@ -237,7 +246,7 @@ class ProfilePage extends StatelessWidget {
                           height: 55,
                           child: OutlinedButton(
                             onPressed: () {
-                              _showLogoutDialog(context); // Panggil Dialog
+                              _showLogoutDialog(context); 
                             },
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.red, width: 1.5),
