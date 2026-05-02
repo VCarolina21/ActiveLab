@@ -196,7 +196,6 @@ class _MembershipPageState extends State<MembershipPage> {
               fit: BoxFit.cover,
             ),
           ),
-
           if (isPaymentSuccess) ...[
             Positioned.fill(
               child: BackdropFilter(
@@ -217,7 +216,6 @@ class _MembershipPageState extends State<MembershipPage> {
                         padding: const EdgeInsets.only(left: 20, top: 10),
                         child: InkWell(
                           onTap: () {
-                            // Mengirim data durasi yang dipilih balik ke ProfilePage
                             Navigator.pop(context, membershipPlans[selectedIndex]['duration']);
                           },
                           child: Container(
@@ -268,23 +266,22 @@ class _MembershipPageState extends State<MembershipPage> {
             SafeArea(
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
                   Center(
-                    child: SizedBox(
-                      height: 80,
-                      width: 80,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
                       child: Image.asset(
-                        'assets/logoactivelab.png',
+                        'assets/logoactivelabterang.png',
+                        height: 280,
+                        width: 280,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => const Icon(
                           Icons.fitness_center,
                           color: Colors.white,
-                          size: 50,
+                          size: 80,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 30),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 25),
                     child: Column(
@@ -296,16 +293,16 @@ class _MembershipPageState extends State<MembershipPage> {
                             color: Colors.white,
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
-                            height: 1.2,
+                            height: 1.1,
                           ),
                         ),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         Text(
                           "Unlock exclusive access to premium gym equipment, VIP recovery rooms, and all elite classes.",
                           style: TextStyle(
                             color: Colors.white70,
                             fontSize: 16,
-                            height: 1.4,
+                            height: 1.3,
                           ),
                         ),
                       ],
@@ -326,7 +323,7 @@ class _MembershipPageState extends State<MembershipPage> {
                             });
                           },
                           child: Container(
-                            margin: const EdgeInsets.only(bottom: 15),
+                            margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(15),
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -367,7 +364,7 @@ class _MembershipPageState extends State<MembershipPage> {
                                       Text(
                                         plan['desc'],
                                         style: const TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 11,
                                           color: Color(0xFF757575),
                                         ),
                                       ),
@@ -399,7 +396,7 @@ class _MembershipPageState extends State<MembershipPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(25),
+                    padding: const EdgeInsets.fromLTRB(25, 10, 25, 20),
                     child: Container(
                       width: double.infinity,
                       height: 55,
