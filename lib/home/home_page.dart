@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math'; 
 
 import 'notif_page.dart';
+import 'start_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../profile/profile_page.dart';
@@ -67,9 +68,7 @@ class _HomePageState extends State<HomePage> {
         : allLocations.where((item) => item['type'] == selectedCategory).toList();
 
     return Scaffold(
-      // PERBAIKAN: Menggunakan extendBody agar konten bisa berada di balik bottom bar yang notch
       extendBody: true,
-      // PENAMBAHAN: Tombol Scan (FloatingActionButton) di tengah
       floatingActionButton: SizedBox(
         width: 60,
         height: 60,
@@ -139,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 100), // Spasi tambahan agar tidak tertutup bottom bar
+                const SizedBox(height: 100), 
               ],
             ),
           ),
@@ -249,7 +248,16 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 5),
               _progressBar(),
               const Text("DAY 3", style: TextStyle(color: Colors.white, fontSize: 60, fontWeight: FontWeight.w900)),
-              ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF1976D2)), child: const Text("START")),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const StartPage()),
+                  );
+                }, 
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF1976D2)), 
+                child: const Text("START")
+              ),
             ])),
           ]),
         ),
@@ -304,7 +312,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // PERBAIKAN: Bottom Nav menggunakan BottomAppBar agar seragam & notch fungsional
   Widget _buildBottomNav(BuildContext context) {
     return BottomAppBar(
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -343,7 +350,6 @@ class _HomePageState extends State<HomePage> {
         if (index == 1) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName)));
         } else if (index == 2) {
-          // PERBAIKAN: Mengirim userName ke ChatPage
           Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
         } else if (index == 3) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
