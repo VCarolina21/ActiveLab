@@ -117,7 +117,7 @@ class _ExplorePageState extends State<ExplorePage> {
       child: const TextField(
         decoration: InputDecoration(
           icon: Icon(Icons.search, color: Colors.grey),
-          hintText: "What's your goal today?",
+          hintText: "Search gyms, classes, or facilities...",
           border: InputBorder.none,
           hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
         ),
