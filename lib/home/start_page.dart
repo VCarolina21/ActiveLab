@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'day_training_page.dart';
+
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
 
@@ -124,7 +126,7 @@ class StartPage extends StatelessWidget {
                         _buildWeekSection("WEEK 2", true, [false, false, false, false, false, false, false]),
                         _buildWeekSection("WEEK 3", true, [false, false, false, false, false, false, false]),
                         _buildWeekSection("WEEK 4", false, [false, false, false, false, false, false, false]),
-                        const SizedBox(height: 80), // Tambahan padding bawah agar tidak tertutup tombol
+                        const SizedBox(height: 80),
                       ],
                     ),
                   ),
@@ -153,7 +155,14 @@ class StartPage extends StatelessWidget {
                   ],
                 ),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DayTrainingPage(),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
