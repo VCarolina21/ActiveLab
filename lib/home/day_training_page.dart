@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'training_timer_page.dart';
+
 class DayTrainingPage extends StatelessWidget {
   const DayTrainingPage({super.key});
 
@@ -110,7 +112,14 @@ class DayTrainingPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TrainingTimerPage(),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
