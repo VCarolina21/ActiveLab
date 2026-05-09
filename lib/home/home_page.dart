@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'notif_page.dart';
 import 'start_page.dart';
+import 'detail_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../profile/profile_page.dart';
@@ -129,6 +130,7 @@ class _HomePageState extends State<HomePage> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: _buildGymCard(
+                        context,
                         data['name']!, 
                         data['loc']!, 
                         randomRate.toStringAsFixed(1), 
@@ -165,45 +167,61 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildGymCard(String name, String loc, String rating, String capacity, String imagePath) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
-          )
-        ],
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: SizedBox(
-              width: 80,
-              height: 80,
-              child: Image.asset(imagePath, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(color: Colors.grey[200], child: const Icon(Icons.image))),
+  Widget _buildGymCard(BuildContext context, String name, String loc, String rating, String capacity, String imagePath) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(
+              title: name,
+              location: loc,
+              rating: double.parse(rating),
+              imagePath: imagePath,
+              quota: capacity,
             ),
           ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 4),
-                Row(children: [const Icon(Icons.location_on, size: 14, color: Colors.grey), const SizedBox(width: 4), Text(loc, style: const TextStyle(color: Colors.grey, fontSize: 12))]),
-                const SizedBox(height: 8),
-                Text(capacity, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4285F4))),
-              ],
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            )
+          ],
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 80,
+                height: 80,
+                child: Image.asset(imagePath, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(color: Colors.grey[200], child: const Icon(Icons.image))),
+              ),
             ),
-          ),
-          Row(children: [const Icon(Icons.star, color: Colors.amber, size: 18), const SizedBox(width: 4), Text(rating, style: const TextStyle(fontWeight: FontWeight.bold))]),
-        ],
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 4),
+                  Row(children: [const Icon(Icons.location_on, size: 14, color: Colors.grey), const SizedBox(width: 4), Text(loc, style: const TextStyle(color: Colors.grey, fontSize: 12))]),
+                  const SizedBox(height: 8),
+                  Text(capacity, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4285F4))),
+                ],
+              ),
+            ),
+            Row(children: [const Icon(Icons.star, color: Colors.amber, size: 18), const SizedBox(width: 4), Text(rating, style: const TextStyle(fontWeight: FontWeight.bold))]),
+          ],
+        ),
       ),
     );
   }
