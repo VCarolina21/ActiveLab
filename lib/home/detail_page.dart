@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
   final String title;
   final String location;
   final double rating;
@@ -15,6 +16,43 @@ class DetailPage extends StatelessWidget {
     required this.imagePath,
     required this.quota,
   });
+
+  @override
+  State<DetailPage> createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  int selectedDateIndex = 0;
+  int selectedTimeIndex = -1;
+
+  late List<Map<String, String>> dates;
+  late List<String> times;
+
+  @override
+  void initState() {
+    super.initState();
+    _generateDynamicDates();
+    _generateDynamicTimes();
+  }
+
+  void _generateDynamicDates() {
+    dates = List.generate(7, (index) {
+      DateTime date = DateTime.now().add(Duration(days: index));
+      List<String> days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      return {
+        "day": days[date.weekday - 1],
+        "date": date.day.toString(),
+      };
+    });
+  }
+
+  void _generateDynamicTimes() {
+    times = [];
+    for (int hour = 10; hour <= 22; hour++) {
+      DateTime tempDate = DateTime(2026, 1, 1, hour);
+      times.add(DateFormat('hh:00 a').format(tempDate));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +71,7 @@ class DetailPage extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(imagePath),
+                          image: AssetImage(widget.imagePath),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -49,7 +87,7 @@ class DetailPage extends StatelessWidget {
                               child: Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.3),
+                                  color: Colors.white.withOpacity(0.3),
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(color: Colors.white, width: 1),
                                 ),
@@ -57,7 +95,7 @@ class DetailPage extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "Detail ${title.split(' ').last}",
+                              "Detail ${widget.title.split(' ').last}",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -88,7 +126,7 @@ class DetailPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                title,
+                                widget.title,
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -100,14 +138,14 @@ class DetailPage extends StatelessWidget {
                                   const Icon(Icons.location_on, color: Colors.blue, size: 18),
                                   const SizedBox(width: 5),
                                   Text(
-                                    location,
+                                    widget.location,
                                     style: const TextStyle(color: Colors.grey),
                                   ),
                                   const SizedBox(width: 15),
                                   const Icon(Icons.star, color: Colors.orange, size: 18),
                                   const SizedBox(width: 5),
                                   Text(
-                                    rating.toString(),
+                                    widget.rating.toString(),
                                     style: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -146,8 +184,88 @@ class DetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        "ActiveLab $location branch provides premium services, spacious areas, and the best facilities to help you achieve your physical goals. Current quota: $quota.",
+                        "ActiveLab ${widget.location} branch provides premium services, spacious areas, and the best facilities to help you achieve your physical goals. Current quota: ${widget.quota}.",
                         style: const TextStyle(color: Colors.grey, height: 1.5, fontSize: 14),
+                      ),
+                      const SizedBox(height: 30),
+                      const Text(
+                        "Select Date",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 15),
+                      SizedBox(
+                        height: 80,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: dates.length,
+                          itemBuilder: (context, index) {
+                            bool isSelected = selectedDateIndex == index;
+                            return GestureDetector(
+                              onTap: () => setState(() => selectedDateIndex = index),
+                              child: Container(
+                                width: 60,
+                                margin: const EdgeInsets.only(right: 15),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? const Color(0xFF4285F4) : Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      dates[index]["day"]!,
+                                      style: TextStyle(
+                                        color: isSelected ? Colors.white70 : Colors.grey,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      dates[index]["date"]!,
+                                      style: TextStyle(
+                                        color: isSelected ? Colors.white : Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      const Text(
+                        "Select Time",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 15),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: List.generate(times.length, (index) {
+                          bool isSelected = selectedTimeIndex == index;
+                          return GestureDetector(
+                            onTap: () => setState(() => selectedTimeIndex = index),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: isSelected ? const Color(0xFF4285F4) : Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected ? const Color(0xFF4285F4) : Colors.grey[300]!,
+                                ),
+                              ),
+                              child: Text(
+                                times[index],
+                                style: TextStyle(
+                                  color: isSelected ? Colors.white : Colors.black87,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
                       ),
                       const SizedBox(height: 30),
                       const Text(
@@ -162,7 +280,7 @@ class DetailPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             )
@@ -173,7 +291,7 @@ class DetailPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 100),
+                      const SizedBox(height: 120),
                     ],
                   ),
                 ),
@@ -188,7 +306,7 @@ class DetailPage extends StatelessWidget {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Colors.black.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -198,13 +316,15 @@ class DetailPage extends StatelessWidget {
                 width: double.infinity,
                 height: 55,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF64B5F6), Color(0xFF2196F3)],
+                  gradient: LinearGradient(
+                    colors: selectedTimeIndex != -1 
+                      ? [const Color(0xFF64B5F6), const Color(0xFF2196F3)]
+                      : [Colors.grey[400]!, Colors.grey[400]!],
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: selectedTimeIndex != -1 ? () {} : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
@@ -234,8 +354,8 @@ class DetailPage extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F7F9),
+          decoration: const BoxDecoration(
+            color: Color(0xFFF5F7F9),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: Colors.blueGrey),
