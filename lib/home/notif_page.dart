@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 
-class NotifPage extends StatelessWidget {
+class NotifPage extends StatefulWidget {
   const NotifPage({super.key});
 
+  static List<String> notifications = [
+    "Your physiotherapy session starts in 30 minutes. Get ready!"
+  ];
+
+  static void addNotification(String title, String date, String month, String year, String time) {
+    notifications.insert(0, "Booking Confirmed! Your $title session on $month $date, $year at $time has been successfully reserved.");
+  }
+
+  @override
+  State<NotifPage> createState() => _NotifPageState();
+}
+
+class _NotifPageState extends State<NotifPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -23,11 +35,10 @@ class NotifPage extends StatelessWidget {
                   Color(0xFFB3E5FC),
                   Colors.white,
                 ],
-                stops: [0.0, 0.25, 0.5, 1.0], 
+                stops: [0.0, 0.25, 0.5, 1.0],
               ),
             ),
           ),
-          
           SafeArea(
             child: Column(
               children: [
@@ -49,7 +60,7 @@ class NotifPage extends StatelessWidget {
                       ),
                       const Expanded(
                         child: Text(
-                          "Notif",
+                          "Notifications",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 20,
@@ -58,20 +69,29 @@ class NotifPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 45), 
+                      const SizedBox(width: 45),
                     ],
                   ),
                 ),
-                
                 const SizedBox(height: 30),
-                
                 Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    children: [
-                      _buildNotifCard("Physiotherapy starts in 30 minutes"),
-                    ],
-                  ),
+                  child: NotifPage.notifications.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "No notifications yet",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          itemCount: NotifPage.notifications.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 15),
+                              child: _buildNotifCard(NotifPage.notifications[index]),
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
@@ -101,9 +121,10 @@ class NotifPage extends StatelessWidget {
         message,
         textAlign: TextAlign.center,
         style: const TextStyle(
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: FontWeight.w500,
           color: Colors.black87,
+          height: 1.5,
         ),
       ),
     );

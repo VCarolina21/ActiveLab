@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'notif_page.dart';
 
 class DetailPage extends StatefulWidget {
   final String title;
@@ -57,6 +58,23 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void _handleBooking() {
+    final selectedData = dates[selectedDateIndex];
+    final now = DateTime.now();
+    final year = now.year.toString();
+    const List<String> months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    final monthName = months[now.month - 1];
+
+    NotifPage.addNotification(
+      widget.title, 
+      selectedData["date"]!, 
+      monthName, 
+      year, 
+      times[selectedTimeIndex]
+    );
+
     setState(() {
       isBooked = true;
     });
