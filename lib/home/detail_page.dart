@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -24,6 +25,7 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   int selectedDateIndex = 0;
   int selectedTimeIndex = -1;
+  bool isBooked = false;
 
   late List<Map<String, String>> dates;
   late List<String> times;
@@ -54,8 +56,24 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  void _handleBooking() {
+    setState(() {
+      isBooked = true;
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isBooked) {
+      return _buildSuccessView();
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -87,7 +105,7 @@ class _DetailPageState extends State<DetailPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(color: Colors.white, width: 1),
                                 ),
@@ -280,7 +298,7 @@ class _DetailPageState extends State<DetailPage> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             )
@@ -306,7 +324,7 @@ class _DetailPageState extends State<DetailPage> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -324,7 +342,7 @@ class _DetailPageState extends State<DetailPage> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: ElevatedButton(
-                  onPressed: selectedTimeIndex != -1 ? () {} : null,
+                  onPressed: selectedTimeIndex != -1 ? _handleBooking : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
@@ -341,6 +359,78 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ),
                 ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuccessView() {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(widget.imagePath),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              color: Colors.black.withValues(alpha: 0.6),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: GestureDetector(
+                      onTap: () => setState(() => isBooked = false),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.arrow_back, color: Colors.black),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  const Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.white,
+                    size: 80,
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    "Booking Completed",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Text(
+                    "Your transaction was successful. Enjoy your premium access to ActiveLab Gym and get ready for ${widget.title}!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 16,
+                      height: 1.6,
+                    ),
+                  ),
+                  const Spacer(flex: 2),
+                ],
               ),
             ),
           ),
