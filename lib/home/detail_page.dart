@@ -3,12 +3,190 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'notif_page.dart';
 
+class ChatMentorPage extends StatefulWidget {
+  final String mentorName;
+  final String mentorRole;
+
+  const ChatMentorPage({
+    super.key,
+    required this.mentorName,
+    required this.mentorRole,
+  });
+
+  @override
+  State<ChatMentorPage> createState() => _ChatMentorPageState();
+}
+
+class _ChatMentorPageState extends State<ChatMentorPage> {
+  final TextEditingController _messageController = TextEditingController();
+  final List<Map<String, dynamic>> _messages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _messages.add({
+      "text": "Halo! Ada yang bisa saya bantu terkait program ${widget.mentorRole} hari ini?",
+      "isMe": false,
+      "time": DateFormat('hh:mm a').format(DateTime.now()),
+    });
+  }
+
+  void _sendMessage() {
+    if (_messageController.text.trim().isEmpty) return;
+
+    setState(() {
+      _messages.add({
+        "text": _messageController.text.trim(),
+        "isMe": true,
+        "time": DateFormat('hh:mm a').format(DateTime.now()),
+      });
+    });
+
+    _messageController.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7F9),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: const Color(0xFF4285F4),
+              child: Text(
+                widget.mentorName[0],
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.mentorName,
+                  style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  widget.mentorRole,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final msg = _messages[index];
+                return Align(
+                  alignment: msg["isMe"] ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: msg["isMe"] ? const Color(0xFF4285F4) : Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(16),
+                        topRight: const Radius.circular(16),
+                        bottomLeft: Radius.circular(msg["isMe"] ? 16 : 0),
+                        bottomRight: Radius.circular(msg["isMe"] ? 0 : 16),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: msg["isMe"] ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          msg["text"],
+                          style: TextStyle(
+                            color: msg["isMe"] ? Colors.white : Colors.black87,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          msg["time"],
+                          style: TextStyle(
+                            color: msg["isMe"] ? Colors.white70 : Colors.grey,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide(color: Color(0xE0E0E0E0))),
+            ),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        hintText: "Type a message...",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF5F7F9),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: _sendMessage,
+                    child: const CircleAvatar(
+                      backgroundColor: Color(0xFF4285F4),
+                      radius: 22,
+                      child: Icon(Icons.send, color: Colors.white, size: 20),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class DetailPage extends StatefulWidget {
   final String title;
   final String location;
   final double rating;
   final String imagePath;
   final String quota;
+  final String mentorName;
+  final String mentorRole;
 
   const DetailPage({
     super.key,
@@ -17,6 +195,8 @@ class DetailPage extends StatefulWidget {
     required this.rating,
     required this.imagePath,
     required this.quota,
+    required this.mentorName,
+    required this.mentorRole,
   });
 
   @override
@@ -188,13 +368,26 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                             ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              shape: BoxShape.circle,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatMentorPage(
+                                    mentorName: widget.mentorName,
+                                    mentorRole: widget.mentorRole,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.chat_bubble_outline),
                             ),
-                            child: const Icon(Icons.chat_bubble_outline),
                           ),
                         ],
                       ),
@@ -282,7 +475,7 @@ class _DetailPageState extends State<DetailPage> {
                         children: List.generate(times.length, (index) {
                           bool isSelected = selectedTimeIndex == index;
                           return GestureDetector(
-                            onTap: () => setState(() => selectedTimeIndex = index),
+                            onTap: () => setState(() => setState(() => selectedTimeIndex = index)),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               decoration: BoxDecoration(

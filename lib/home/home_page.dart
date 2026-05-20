@@ -168,6 +168,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildGymCard(BuildContext context, String name, String loc, String rating, String capacity, String imagePath) {
+    String mentorName = "Woody";
+    String mentorRole = "MoveFit Mentor";
+
+    if (name.toLowerCase().contains("active")) {
+      mentorName = "Gerry";
+      mentorRole = "ActiveFit Mentor";
+    } else if (name.toLowerCase().contains("flex")) {
+      mentorName = "Sonia";
+      mentorRole = "FlexFit Mentor";
+    } else if (name.toLowerCase().contains("core")) {
+      mentorName = "Alan";
+      mentorRole = "CoreFit Mentor";
+    }
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -179,6 +193,8 @@ class _HomePageState extends State<HomePage> {
               rating: double.parse(rating),
               imagePath: imagePath,
               quota: capacity,
+              mentorName: mentorName,
+              mentorRole: mentorRole,
             ),
           ),
         );
