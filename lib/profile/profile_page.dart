@@ -5,6 +5,7 @@ import '../chat/chat_page.dart';
 import '../sign_in/sign_page.dart';
 import 'legal_policy_page.dart';
 import 'membership_page.dart';
+import 'booking_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String userName;
@@ -228,7 +229,16 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 30),
                       _buildSectionTitle("Activity"),
                       _buildMenuCard([
-                        _buildMenuItem(Icons.calendar_today_outlined, "My Bookings"),
+                        _buildMenuItem(
+                          Icons.calendar_today_outlined, 
+                          "My Bookings",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const BookingPage()),
+                            );
+                          },
+                        ),
                         _buildDivider(),
                         _buildMenuItem(
                           Icons.shopping_bag_outlined, 

@@ -3,12 +3,17 @@ import 'package:flutter/material.dart';
 class NotifPage extends StatefulWidget {
   const NotifPage({super.key});
 
-  static List<String> notifications = [
-    "Your physiotherapy session starts in 30 minutes. Get ready!"
-  ];
+  static final List<Map<String, String>> notifications = <Map<String, String>>[];
 
-  static void addNotification(String title, String date, String month, String year, String time) {
-    notifications.insert(0, "Booking Confirmed! Your $title session on $month $date, $year at $time has been successfully reserved.");
+  static void addNotification(String title, String date, String month, String year, String time, {String status = "Pending"}) {
+    notifications.add({
+      "title": title,
+      "date": date,
+      "month": month,
+      "year": year,
+      "time": time,
+      "status": status,
+    });
   }
 
   @override
@@ -19,130 +24,149 @@ class _NotifPageState extends State<NotifPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF0D47A1),
-                  Color(0xFF42A5F5),
-                  Color(0xFFB3E5FC),
-                  Colors.white,
-                ],
-                stops: [0.0, 0.25, 0.5, 1.0],
-              ),
-            ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF0D47A1),
+              Color(0xFF42A5F5),
+              Color(0xFFB3E5FC),
+              Colors.white,
+            ],
+            stops: [0.0, 0.25, 0.5, 1.0],
           ),
-          SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Container(
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black12),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: Colors.white.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white, width: 1),
                         ),
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
-                          onPressed: () => Navigator.pop(context),
-                        ),
+                        child: const Icon(Icons.arrow_back, color: Colors.white),
                       ),
-                      const Expanded(
+                    ),
+                    const Expanded(
+                      child: Center(
                         child: Text(
                           "Notifications",
-                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
                             color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 45),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 40),
+                  ],
                 ),
-                const SizedBox(height: 30),
-                Expanded(
-                  child: NotifPage.notifications.isEmpty
-                      ? const Center(
-                          child: Text(
-                            "No notifications yet",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          itemCount: NotifPage.notifications.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 15),
-                              child: _buildNotifCard(NotifPage.notifications[index]),
-                            );
-                          },
+              ),
+              Expanded(
+                child: NotifPage.notifications.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "No notifications yet",
+                          style: TextStyle(color: Colors.white70, fontSize: 16),
                         ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: _buildBottomNav(),
-    );
-  }
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        itemCount: NotifPage.notifications.length,
+                        itemBuilder: (context, index) {
+                          final notif = NotifPage.notifications[index];
+                          bool isCanceled = notif["status"] == "Canceled";
 
-  Widget _buildNotifCard(String message) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 15),
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: isCanceled ? const Color(0xFFFFEBEE) : const Color(0xFFE3F2FD),
+                                  child: Icon(
+                                    isCanceled ? Icons.cancel_rounded : Icons.calendar_today,
+                                    color: isCanceled ? Colors.redAccent : const Color(0xFF4285F4),
+                                  ),
+                                ),
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        notif["title"] ?? "",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      if (isCanceled) ...[
+                                        RichText(
+                                          text: TextSpan(
+                                            style: const TextStyle(fontSize: 13, color: Colors.grey),
+                                            children: [
+                                              const TextSpan(
+                                                text: "Canceled",
+                                                style: TextStyle(
+                                                  color: Colors.redAccent,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: " for ${notif["date"] ?? ""} ${notif["month"] ?? ""} ${notif["year"] ?? ""} at ${notif["time"] ?? ""}",
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ] else ...[
+                                        Text(
+                                          "Booked for ${notif["date"] ?? ""} ${notif["month"] ?? ""} ${notif["year"] ?? ""} at ${notif["time"] ?? ""}",
+                                          style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Text(
-        message,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-          color: Colors.black87,
-          height: 1.5,
         ),
       ),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      currentIndex: 0,
-      selectedItemColor: const Color(0xFF4285F4),
-      unselectedItemColor: Colors.grey,
-      showUnselectedLabels: true,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: "Explore"),
-        BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: "Chat"),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "Profile"),
-      ],
     );
   }
 }
