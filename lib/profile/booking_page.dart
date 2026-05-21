@@ -239,6 +239,9 @@ class _BookingPageState extends State<BookingPage> {
                           } else if (titleLower.contains("spa")) {
                             branchLocation = "Jakarta";
                             assetImage = "assets/spa.JPG";
+                          } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
+                            branchLocation = "Jakarta Utara";
+                            assetImage = "assets/fisioterapi.JPG";
                           }
 
                           String dateStr = notif["date"] ?? "";

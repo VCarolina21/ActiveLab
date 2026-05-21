@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'mentor_detail_page.dart';
 import '../chat/chat_page.dart';
 import '../profile/profile_page.dart';
+import '../home/notif_page.dart';
 
 class ExplorePage extends StatefulWidget {
   final String userName;
@@ -126,6 +126,23 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
   Widget _buildLastBooking() {
+    final List<Map<String, String>> validBookings = [];
+    final Set<String> uniqueKeys = {};
+
+    for (int i = NotifPage.notifications.length - 1; i >= 0; i--) {
+      final item = NotifPage.notifications[i];
+      String title = item["title"] ?? "";
+      String date = item["date"] ?? "";
+      String time = item["time"] ?? "";
+      
+      String uniqueKey = "$title-$date-$time";
+
+      if (!uniqueKeys.contains(uniqueKey)) {
+        uniqueKeys.add(uniqueKey);
+        validBookings.add(Map<String, String>.from(item));
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -140,24 +157,55 @@ class _ExplorePageState extends State<ExplorePage> {
           ],
         ),
         const SizedBox(height: 10),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildBookingCard("GYM 1", "50 %", "assets/gymuntar.jpg"),
-              const SizedBox(width: 15),
-              _buildBookingCard("GYM 2", "50 %", "assets/gymuntar.jpg"),
-            ],
-          ),
-        ),
+        validBookings.isEmpty
+            ? const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Text(
+                  "No recent booking history found.",
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              )
+            : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(validBookings.length, (index) {
+                    final booking = validBookings[index];
+                    String title = booking["title"] ?? "";
+                    
+                    String assetImage = "assets/gymuntar.jpg";
+                    String titleLower = title.toLowerCase();
+                    
+                    if (titleLower.contains("yoga")) {
+                      assetImage = "assets/yoga.JPG";
+                    } else if (titleLower.contains("hiit")) {
+                      assetImage = "assets/hiit.JPG";
+                    } else if (titleLower.contains("pilates")) {
+                      assetImage = "assets/pilates.JPG";
+                    } else if (titleLower.contains("massage")) {
+                      assetImage = "assets/massage.JPG";
+                    } else if (titleLower.contains("spa")) {
+                      assetImage = "assets/spa.JPG";
+                    } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
+                      assetImage = "assets/fisioterapi.JPG";
+                    }
+
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: index == validBookings.length - 1 ? 0.0 : 15.0,
+                      ),
+                      child: _buildBookingCard(title, assetImage),
+                    );
+                  }),
+                ),
+              ),
       ],
     );
   }
 
-  Widget _buildBookingCard(String name, String progress, String imagePath) {
+  Widget _buildBookingCard(String name, String imagePath) {
     return Container(
-      width: 150, 
-      height: 90,
+      width: 160, 
+      height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
@@ -170,53 +218,24 @@ class _ExplorePageState extends State<ExplorePage> {
         image: DecorationImage(
           image: AssetImage(imagePath),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.4), BlendMode.darken),
+          colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.35), BlendMode.darken),
         ),
       ),
-      child: Stack(
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Text(
-                name,
-                style: const TextStyle(
-                  color: Color(0xFFF5F5F5), 
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18, 
-                ),
-              ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: Text(
+            name,
+            style: const TextStyle(
+              color: Colors.white, 
+              fontWeight: FontWeight.bold,
+              fontSize: 14, 
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 15),
-              child: Container(
-                width: 55, 
-                height: 55,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF4FC3F7), 
-                    width: 4, 
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    progress,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14, 
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -402,7 +421,6 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  // PERBAIKAN: Bottom Nav diganti menjadi BottomAppBar agar seragam & fungsional
   Widget _buildBottomNav(BuildContext context) {
     return BottomAppBar(
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -436,20 +454,22 @@ class _ExplorePageState extends State<ExplorePage> {
   Widget _navItem(BuildContext context, IconData icon, String label, bool isActive, int index) {
     return MaterialButton(
       minWidth: 40,
-      onPressed: () {
+      onPressed: () async {
         if (isActive) return;
         if (index == 0) {
           Navigator.pop(context);
         } else if (index == 2) {
-          Navigator.push(
+          await Navigator.push(
             context, 
             MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName))
           );
+          if (mounted) setState(() {});
         } else if (index == 3) {
-          Navigator.push(
+          await Navigator.push(
             context, 
             MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName))
           );
+          if (mounted) setState(() {});
         }
       },
       child: Column(
