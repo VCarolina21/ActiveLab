@@ -1,10 +1,34 @@
 import 'package:flutter/material.dart';
+import 'training_timer_page.dart';
 
 class DayTrainingPage extends StatelessWidget {
   const DayTrainingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> exercises = [
+      {
+        "title": "Knee push up",
+        "duration": "00:30",
+        "image": "assets/kneepushup.jpeg"
+      },
+      {
+        "title": "Push up",
+        "duration": "00:30",
+        "image": "assets/pushup.png"
+      },
+      {
+        "title": "Wide Push Up",
+        "duration": "00:30",
+        "image": "assets/widepushup.jpeg"
+      },
+      {
+        "title": "Triangle Push Up",
+        "duration": "00:30",
+        "image": "assets/trianglepushup.png"
+      },
+    ];
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -81,13 +105,13 @@ class DayTrainingPage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 30),
-                        _buildExerciseTile("Knee push up", "00:30", 'assets/kneepushup.jpeg'),
+                        _buildExerciseTile(exercises[0]["title"]!, exercises[0]["duration"]!, exercises[0]["image"]!),
                         const Divider(height: 30),
-                        _buildExerciseTile("Push up", "00:30", 'assets/pushup.png'),
+                        _buildExerciseTile(exercises[1]["title"]!, exercises[1]["duration"]!, exercises[1]["image"]!),
                         const Divider(height: 30),
-                        _buildExerciseTile("Wide Push Up", "00:30", 'assets/widepushup.jpeg'),
+                        _buildExerciseTile(exercises[2]["title"]!, exercises[2]["duration"]!, exercises[2]["image"]!),
                         const Divider(height: 30),
-                        _buildExerciseTile("Triangle Push Up", "00:30", 'assets/trianglepushup.png'),
+                        _buildExerciseTile(exercises[3]["title"]!, exercises[3]["duration"]!, exercises[3]["image"]!),
                         const SizedBox(height: 100),
                       ],
                     ),
@@ -110,7 +134,14 @@ class DayTrainingPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TrainingTimerPage(exercises: exercises),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
