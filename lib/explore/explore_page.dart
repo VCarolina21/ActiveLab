@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'mentor_detail_page.dart';
+import 'searching_page.dart';
 import '../chat/chat_page.dart';
 import '../profile/profile_page.dart';
 import '../home/notif_page.dart';
@@ -114,8 +115,17 @@ class _ExplorePageState extends State<ExplorePage> {
           )
         ],
       ),
-      child: const TextField(
-        decoration: InputDecoration(
+      child: TextField(
+        readOnly: true,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SearchingPage(),
+            ),
+          );
+        },
+        decoration: const InputDecoration(
           icon: Icon(Icons.search, color: Colors.grey),
           hintText: "Search gyms, classes, or facilities...",
           border: InputBorder.none,
@@ -146,17 +156,8 @@ class _ExplorePageState extends State<ExplorePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Last Booking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-            TextButton(
-              onPressed: () {},
-              child: const Text("See All", style: TextStyle(color: Colors.white70)),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
+        const Text("Last Booking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+        const SizedBox(height: 15),
         validBookings.isEmpty
             ? const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
