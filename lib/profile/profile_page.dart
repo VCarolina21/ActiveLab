@@ -18,6 +18,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   String membershipDuration = "12 Month";
+  String selectedPayment = "BCA";
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -122,6 +123,140 @@ class _ProfilePageState extends State<ProfilePage> {
         membershipDuration = result;
       });
     }
+  }
+
+  void _showPaymentMethodPopup(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: const EdgeInsets.all(25),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Payment Method",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _buildPaymentOption(
+                    setModalState,
+                    "BCA",
+                    "assets/logobca.png",
+                  ),
+                  const SizedBox(height: 15),
+                  _buildPaymentOption(
+                    setModalState,
+                    "Mandiri",
+                    "assets/logomandiri.png",
+                  ),
+                  const SizedBox(height: 15),
+                  _buildPaymentOption(
+                    setModalState,
+                    "QRIS",
+                    "assets/logoqris.png",
+                  ),
+                  const SizedBox(height: 30),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4285F4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: const Text(
+                        "Done",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildPaymentOption(StateSetter setModalState, String name, String imagePath) {
+    bool isSelected = selectedPayment == name;
+    return GestureDetector(
+      onTap: () {
+        setModalState(() {
+          selectedPayment = name;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF4285F4) : Colors.grey.shade200,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Image.asset(
+              imagePath,
+              width: 120,
+              height: 50,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Text(
+                name,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+            const Spacer(),
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? const Color(0xFF4285F4) : Colors.grey.shade400,
+                  width: 2,
+                ),
+                color: isSelected ? const Color(0xFF4285F4) : Colors.transparent,
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, color: Colors.white, size: 16)
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -246,7 +381,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           onTap: () => _navigateToMembership(context),
                         ),
                         _buildDivider(),
-                        _buildMenuItem(Icons.account_balance_wallet_outlined, "Payment Methods"),
+                        _buildMenuItem(
+                          Icons.account_balance_wallet_outlined, 
+                          "Payment Methods",
+                          onTap: () => _showPaymentMethodPopup(context),
+                        ),
                       ]),
                       const SizedBox(height: 20),
                       _buildSectionTitle("Setup & Help"),
