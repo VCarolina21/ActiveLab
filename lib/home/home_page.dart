@@ -4,6 +4,7 @@ import 'dart:math';
 import 'notif_page.dart';
 import 'start_page.dart';
 import 'detail_page.dart';
+import 'weekly_target_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../profile/profile_page.dart';
@@ -306,22 +307,30 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildWeeklyTarget() {
     int currentStreak = 3;
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))]),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("WEEKLY TARGET", style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 15), 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, 
-            children: List.generate(7, (i) {
-              int dayNumber = i + 1;
-              return _dayCircle(dayNumber <= currentStreak, dayNumber, dayNumber == currentStreak);
-            }),
-          ),
-        ]
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const WeeklyTargetPage()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("WEEKLY TARGET", style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 15), 
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+              children: List.generate(7, (i) {
+                int dayNumber = i + 1;
+                return _dayCircle(dayNumber <= currentStreak, dayNumber, dayNumber == currentStreak);
+              }),
+            ),
+          ]
+        ),
       ),
     );
   }
