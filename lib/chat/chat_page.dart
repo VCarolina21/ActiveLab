@@ -359,10 +359,12 @@ class _ChatPageState extends State<ChatPage> {
       minWidth: 40,
       onPressed: () {
         if (isActive) return;
-        if (index == 0 || index == 1) {
-          Navigator.pop(context);
+        if (index == 0) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        } else if (index == 1) {
+          Navigator.of(context).pop();
         } else if (index == 3) {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => ProfilePage(userName: widget.userName),
