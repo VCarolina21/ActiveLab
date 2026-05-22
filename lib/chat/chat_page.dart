@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'chat_detail_page.dart';
 import '../profile/profile_page.dart';
 
@@ -12,7 +11,10 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final List<Map<String, dynamic>> chats = [
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _filteredChats = [];
+
+  final List<Map<String, dynamic>> _allChats = [
     {
       "name": "Crystal (CoreFit Gym)",
       "msg": "Don't forget your protein intake!",
@@ -102,6 +104,31 @@ class _ChatPageState extends State<ChatPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _filteredChats = List.from(_allChats);
+  }
+
+  void _filterSearch(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredChats = List.from(_allChats);
+      } else {
+        _filteredChats = _allChats.where((chat) {
+          final nameLower = chat["name"]!.toString().toLowerCase();
+          return nameLower.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
@@ -166,15 +193,22 @@ class _ChatPageState extends State<ChatPage> {
                       topRight: Radius.circular(30),
                     ),
                   ),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 100),
-                    itemCount: chats.length,
-                    separatorBuilder: (context, index) => const Divider(
-                      color: Color(0xFFF5F5F5),
-                      indent: 85,
-                    ),
-                    itemBuilder: (context, index) => _buildChatTile(chats[index]),
-                  ),
+                  child: _filteredChats.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "No mentors found.",
+                            style: TextStyle(color: Colors.grey, fontSize: 16),
+                          ),
+                        )
+                      : ListView.separated(
+                          padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 100),
+                          itemCount: _filteredChats.length,
+                          separatorBuilder: (context, index) => const Divider(
+                            color: Color(0xFFF5F5F5),
+                            indent: 85,
+                          ),
+                          itemBuilder: (context, index) => _buildChatTile(_filteredChats[index]),
+                        ),
                 ),
               ),
             ],
@@ -200,8 +234,10 @@ class _ChatPageState extends State<ChatPage> {
             )
           ],
         ),
-        child: const TextField(
-          decoration: InputDecoration(
+        child: TextField(
+          controller: _searchController,
+          onChanged: _filterSearch,
+          decoration: const InputDecoration(
             icon: Icon(Icons.search, color: Colors.black54),
             hintText: "Search...",
             border: InputBorder.none,
