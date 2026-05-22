@@ -4,6 +4,8 @@ import 'searching_page.dart';
 import '../chat/chat_page.dart';
 import '../profile/profile_page.dart';
 import '../home/notif_page.dart';
+import '../home/home_page.dart';
+import '../scan/check_in_page.dart';
 
 class ExplorePage extends StatefulWidget {
   final String userName;
@@ -25,7 +27,12 @@ class _ExplorePageState extends State<ExplorePage> {
         width: 60,
         height: 60,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CheckInPage()),
+            );
+          },
           backgroundColor: Colors.white,
           elevation: 4,
           shape: const CircleBorder(),
@@ -455,22 +462,23 @@ class _ExplorePageState extends State<ExplorePage> {
   Widget _navItem(BuildContext context, IconData icon, String label, bool isActive, int index) {
     return MaterialButton(
       minWidth: 40,
-      onPressed: () async {
+      onPressed: () {
         if (isActive) return;
         if (index == 0) {
-          Navigator.pop(context);
+          Navigator.pushReplacement(
+            context, 
+            MaterialPageRoute(builder: (context) => HomePage(userName: widget.userName))
+          );
         } else if (index == 2) {
-          await Navigator.push(
+          Navigator.pushReplacement(
             context, 
             MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName))
           );
-          if (mounted) setState(() {});
         } else if (index == 3) {
-          await Navigator.push(
+          Navigator.pushReplacement(
             context, 
             MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName))
           );
-          if (mounted) setState(() {});
         }
       },
       child: Column(

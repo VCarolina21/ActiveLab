@@ -3,6 +3,7 @@ import '../home/home_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../sign_in/sign_page.dart';
+import '../scan/check_in_page.dart';
 import 'legal_policy_page.dart';
 import 'membership_page.dart';
 import 'booking_page.dart';
@@ -268,7 +269,12 @@ class _ProfilePageState extends State<ProfilePage> {
         width: 60,
         height: 60,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CheckInPage()),
+            );
+          },
           backgroundColor: Colors.white,
           elevation: 4,
           shape: const CircleBorder(),

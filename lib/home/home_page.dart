@@ -5,6 +5,7 @@ import 'notif_page.dart';
 import 'start_page.dart';
 import 'detail_page.dart';
 import 'weekly_target_page.dart';
+import '../scan/check_in_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../profile/profile_page.dart';
@@ -75,7 +76,12 @@ class _HomePageState extends State<HomePage> {
         width: 60,
         height: 60,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CheckInPage()),
+            );
+          },
           backgroundColor: Colors.white,
           elevation: 4,
           shape: const CircleBorder(),
@@ -391,11 +397,11 @@ class _HomePageState extends State<HomePage> {
       onPressed: () {
         if (isActive) return;
         if (index == 1) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName)));
         } else if (index == 2) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
         } else if (index == 3) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
         }
       },
       child: Column(

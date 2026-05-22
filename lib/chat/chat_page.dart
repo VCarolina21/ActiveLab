@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'chat_detail_page.dart';
 import '../profile/profile_page.dart';
+import '../explore/explore_page.dart';
+import '../home/home_page.dart';
+import '../scan/check_in_page.dart';
 
 class ChatPage extends StatefulWidget {
   final String userName;
@@ -137,7 +140,12 @@ class _ChatPageState extends State<ChatPage> {
         width: 60,
         height: 60,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CheckInPage()),
+            );
+          },
           backgroundColor: Colors.white,
           elevation: 4,
           shape: const CircleBorder(),
@@ -360,9 +368,19 @@ class _ChatPageState extends State<ChatPage> {
       onPressed: () {
         if (isActive) return;
         if (index == 0) {
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(userName: widget.userName),
+            ),
+          );
         } else if (index == 1) {
-          Navigator.of(context).pop();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExplorePage(userName: widget.userName),
+            ),
+          );
         } else if (index == 3) {
           Navigator.pushReplacement(
             context,
