@@ -4,6 +4,7 @@ import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../sign_in/sign_page.dart';
 import '../scan/check_in_page.dart';
+import '../home/notif_page.dart';
 import 'legal_policy_page.dart';
 import 'membership_page.dart';
 import 'booking_page.dart';
@@ -270,9 +271,79 @@ class _ProfilePageState extends State<ProfilePage> {
         height: 60,
         child: FloatingActionButton(
           onPressed: () {
+            String title = "CoreFit Spa";
+            String date = "24 May";
+            String time = "11:00 AM";
+
+            if (NotifPage.notifications.isNotEmpty) {
+              final firstBooking = NotifPage.notifications.first;
+              title = (firstBooking["title"] ?? "CoreFit Spa").toString();
+              date = (firstBooking["date"] ?? "24 May").toString();
+              time = (firstBooking["time"] ?? "11:00 AM").toString();
+            }
+
+            String assetImage = "assets/spa.JPG";
+            String type = "SPA";
+            String titleLower = title.toLowerCase();
+
+            if (titleLower.contains("yoga")) {
+              assetImage = "assets/yoga.JPG";
+              type = "YOGA";
+            } else if (titleLower.contains("hiit")) {
+              assetImage = "assets/hiit.JPG";
+              type = "HIIT";
+            } else if (titleLower.contains("pilates")) {
+              assetImage = "assets/pilates.JPG";
+              type = "PILATES";
+            } else if (titleLower.contains("massage")) {
+              assetImage = "assets/massage.JPG";
+              type = "MASSAGE";
+            } else if (titleLower.contains("spa")) {
+              assetImage = "assets/spa.JPG";
+              type = "SPA";
+            } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
+              assetImage = "assets/fisioterapi.JPG";
+              type = "PHYSIOTHERAPY";
+            } else if (titleLower.contains("gym")) {
+              assetImage = "assets/gymuntar.jpg";
+              type = "GYM";
+            }
+
+            int dayNum = 24;
+            final RegExp matchDay = RegExp(r'^\d+');
+            if (matchDay.hasMatch(date)) {
+              dayNum = int.parse(matchDay.stringMatch(date)!);
+            }
+            
+            String monthYear = date.replaceFirst(matchDay, '').trim();
+            if (monthYear.contains(",")) {
+              monthYear = monthYear.split(",").first.trim();
+            }
+
+            if (monthYear.isEmpty) {
+              monthYear = "May 2026";
+            } else if (!monthYear.contains("2026")) {
+              monthYear = "$monthYear 2026";
+            }
+            
+            String finalBookingRange = "$dayNum $monthYear";
+
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CheckInPage()),
+              MaterialPageRoute(
+                builder: (context) => CheckInPage(
+                  dateString: "$date, $time",
+                  gymName: title,
+                  location: "Jakarta",
+                  rating: 4.9,
+                  imagePath: assetImage,
+                  bookingDates: finalBookingRange,
+                  guestInfo: "2 Guests (1 Room)",
+                  roomType: type,
+                  phoneNumber: "0214345646",
+                  status: "Pending",
+                ),
+              ),
             );
           },
           backgroundColor: Colors.white,
@@ -335,10 +406,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             Text(
                               widget.userName.isNotEmpty ? widget.userName : "User",
                               style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                                  fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                             const SizedBox(height: 5),
                             const Text(
@@ -359,7 +427,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   const SizedBox(width: 8),
                                   Text(
                                     membershipDuration,
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        color: Colors.white, fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -371,7 +440,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildSectionTitle("Activity"),
                       _buildMenuCard([
                         _buildMenuItem(
-                          Icons.calendar_today_outlined, 
+                          Icons.calendar_today_outlined,
                           "My Bookings",
                           onTap: () {
                             Navigator.push(
@@ -382,13 +451,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         _buildDivider(),
                         _buildMenuItem(
-                          Icons.shopping_bag_outlined, 
+                          Icons.shopping_bag_outlined,
                           "My Memberships",
                           onTap: () => _navigateToMembership(context),
                         ),
                         _buildDivider(),
                         _buildMenuItem(
-                          Icons.account_balance_wallet_outlined, 
+                          Icons.account_balance_wallet_outlined,
                           "Payment Methods",
                           onTap: () => _showPaymentMethodPopup(context),
                         ),
@@ -397,7 +466,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildSectionTitle("Setup & Help"),
                       _buildMenuCard([
                         _buildMenuItem(
-                          Icons.gavel_outlined, 
+                          Icons.gavel_outlined,
                           "Legal and Policies",
                           onTap: () {
                             Navigator.push(
@@ -415,7 +484,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           height: 55,
                           child: OutlinedButton(
                             onPressed: () {
-                              _showLogoutDialog(context); 
+                              _showLogoutDialog(context);
                             },
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.red, width: 1.5),
@@ -483,11 +552,14 @@ class _ProfilePageState extends State<ProfilePage> {
       onPressed: () {
         if (isActive) return;
         if (index == 0) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(userName: widget.userName)));
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => HomePage(userName: widget.userName)));
         } else if (index == 1) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName)));
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName)));
         } else if (index == 2) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
         }
       },
       child: Column(

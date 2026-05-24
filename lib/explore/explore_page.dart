@@ -28,9 +28,79 @@ class _ExplorePageState extends State<ExplorePage> {
         height: 60,
         child: FloatingActionButton(
           onPressed: () {
+            String title = "CoreFit Spa";
+            String date = "24 May";
+            String time = "11:00 AM";
+
+            if (NotifPage.notifications.isNotEmpty) {
+              final firstBooking = NotifPage.notifications.first;
+              title = (firstBooking["title"] ?? "CoreFit Spa").toString();
+              date = (firstBooking["date"] ?? "24 May").toString();
+              time = (firstBooking["time"] ?? "11:00 AM").toString();
+            }
+
+            String assetImage = "assets/spa.JPG";
+            String type = "SPA";
+            String titleLower = title.toLowerCase();
+
+            if (titleLower.contains("yoga")) {
+              assetImage = "assets/yoga.JPG";
+              type = "YOGA";
+            } else if (titleLower.contains("hiit")) {
+              assetImage = "assets/hiit.JPG";
+              type = "HIIT";
+            } else if (titleLower.contains("pilates")) {
+              assetImage = "assets/pilates.JPG";
+              type = "PILATES";
+            } else if (titleLower.contains("massage")) {
+              assetImage = "assets/massage.JPG";
+              type = "MASSAGE";
+            } else if (titleLower.contains("spa")) {
+              assetImage = "assets/spa.JPG";
+              type = "SPA";
+            } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
+              assetImage = "assets/fisioterapi.JPG";
+              type = "PHYSIOTHERAPY";
+            } else if (titleLower.contains("gym")) {
+              assetImage = "assets/gymuntar.jpg";
+              type = "GYM";
+            }
+
+            int dayNum = 24;
+            final RegExp matchDay = RegExp(r'^\d+');
+            if (matchDay.hasMatch(date)) {
+              dayNum = int.parse(matchDay.stringMatch(date)!);
+            }
+            
+            String monthYear = date.replaceFirst(matchDay, '').trim();
+            if (monthYear.contains(",")) {
+              monthYear = monthYear.split(",").first.trim();
+            }
+
+            if (monthYear.isEmpty) {
+              monthYear = "May 2026";
+            } else if (!monthYear.contains("2026")) {
+              monthYear = "$monthYear 2026";
+            }
+            
+            String finalBookingRange = "$dayNum $monthYear";
+
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CheckInPage()),
+              MaterialPageRoute(
+                builder: (context) => CheckInPage(
+                  dateString: "$date, $time",
+                  gymName: title,
+                  location: "Jakarta",
+                  rating: 4.9,
+                  imagePath: assetImage,
+                  bookingDates: finalBookingRange,
+                  guestInfo: "2 Guests (1 Room)",
+                  roomType: type,
+                  phoneNumber: "0214345646",
+                  status: "Pending",
+                ),
+              ),
             );
           },
           backgroundColor: Colors.white,
@@ -99,7 +169,7 @@ class _ExplorePageState extends State<ExplorePage> {
           children: [
             const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 13)),
             Text(
-              widget.userName.isNotEmpty ? widget.userName : "User", 
+              widget.userName.isNotEmpty ? widget.userName : "User",
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
             ),
           ],
@@ -148,22 +218,27 @@ class _ExplorePageState extends State<ExplorePage> {
 
     for (int i = NotifPage.notifications.length - 1; i >= 0; i--) {
       final item = NotifPage.notifications[i];
-      String title = item["title"] ?? "";
-      String date = item["date"] ?? "";
-      String time = item["time"] ?? "";
-      
+      String title = (item["title"] ?? "").toString();
+      String date = (item["date"] ?? "").toString();
+      String time = (item["time"] ?? "").toString();
+
       String uniqueKey = "$title-$date-$time";
 
       if (!uniqueKeys.contains(uniqueKey)) {
         uniqueKeys.add(uniqueKey);
-        validBookings.add(Map<String, String>.from(item));
+        validBookings.add({
+          "title": title,
+          "date": date,
+          "time": time,
+        });
       }
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Last Booking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+        const Text("Last Booking",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
         const SizedBox(height: 15),
         validBookings.isEmpty
             ? const Padding(
@@ -179,10 +254,10 @@ class _ExplorePageState extends State<ExplorePage> {
                   children: List.generate(validBookings.length, (index) {
                     final booking = validBookings[index];
                     String title = booking["title"] ?? "";
-                    
+
                     String assetImage = "assets/gymuntar.jpg";
                     String titleLower = title.toLowerCase();
-                    
+
                     if (titleLower.contains("yoga")) {
                       assetImage = "assets/yoga.JPG";
                     } else if (titleLower.contains("hiit")) {
@@ -212,16 +287,13 @@ class _ExplorePageState extends State<ExplorePage> {
 
   Widget _buildBookingCard(String name, String imagePath) {
     return Container(
-      width: 160, 
+      width: 160,
       height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 10, 
-            offset: const Offset(0, 4)
-          )
+              color: Colors.black.withValues(alpha: 0.25), blurRadius: 10, offset: const Offset(0, 4))
         ],
         image: DecorationImage(
           image: AssetImage(imagePath),
@@ -236,9 +308,9 @@ class _ExplorePageState extends State<ExplorePage> {
           child: Text(
             name,
             style: const TextStyle(
-              color: Colors.white, 
+              color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 14, 
+              fontSize: 14,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -275,8 +347,8 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
   Widget _buildMentorAvatar(String name, String imagePath) {
-    String detailImage = imagePath.toLowerCase().contains("cewe") 
-        ? "assets/mentorcewe.png" 
+    String detailImage = imagePath.toLowerCase().contains("cewe")
+        ? "assets/mentorcewe.png"
         : "assets/mentorcowo.png";
 
     String exp = "5 Years";
@@ -285,23 +357,41 @@ class _ExplorePageState extends State<ExplorePage> {
     String about = "Certified instructor dedicated to helping you reach your fitness goals.";
 
     if (name == "Garry") {
-      exp = "8 Years"; age = "30"; work = "CoreFit Gym";
-      about = "Expert in high-intensity muscle building and strength conditioning at CoreFit. Garry focuses on proper form and powerlifting techniques.";
+      exp = "8 Years";
+      age = "30";
+      work = "CoreFit Gym";
+      about =
+          "Expert in high-intensity muscle building and strength conditioning at CoreFit. Garry focuses on proper form and powerlifting techniques.";
     } else if (name == "Jessica") {
-      exp = "6 Years"; age = "28"; work = "MoveFit Pilates";
-      about = "Specializes in clinical pilates and core stability. Jessica helps clients improve flexibility and posture through mindful movement.";
+      exp = "6 Years";
+      age = "28";
+      work = "MoveFit Pilates";
+      about =
+          "Specializes in clinical pilates and core stability. Jessica helps clients improve flexibility and posture through mindful movement.";
     } else if (name == "Sofia") {
-      exp = "10 Years"; age = "32"; work = "FlexFit Yoga";
-      about = "A master of Vinyasa and Hatha Yoga. Sofia integrates mental wellness with physical strength, guiding students through a holistic journey.";
+      exp = "10 Years";
+      age = "32";
+      work = "FlexFit Yoga";
+      about =
+          "A master of Vinyasa and Hatha Yoga. Sofia integrates mental wellness with physical strength, guiding students through a holistic journey.";
     } else if (name == "Crystal") {
-      exp = "4 Years"; age = "24"; work = "Elite Fitness";
-      about = "Passionate about cardio and fat-loss programs. Crystal's energetic approach makes every workout session feel like a new challenge.";
+      exp = "4 Years";
+      age = "24";
+      work = "Elite Fitness";
+      about =
+          "Passionate about cardio and fat-loss programs. Crystal's energetic approach makes every workout session feel like a new challenge.";
     } else if (name == "Karl") {
-      exp = "12 Years"; age = "35"; work = "Iron Paradise";
-      about = "Former professional athlete. Karl brings a competitive edge to training, specializing in endurance and performance.";
+      exp = "12 Years";
+      age = "35";
+      work = "Iron Paradise";
+      about =
+          "Former professional athlete. Karl brings a competitive edge to training, specializing in endurance and performance.";
     } else if (name == "Woody") {
-      exp = "7 Years"; age = "29"; work = "Body Mechanics";
-      about = "Focuses on functional training and injury recovery. Woody ensures your body moves correctly so you can stay active for life.";
+      exp = "7 Years";
+      age = "29";
+      work = "Body Mechanics";
+      about =
+          "Focuses on functional training and injury recovery. Woody ensures your body moves correctly so you can stay active for life.";
     }
 
     return GestureDetector(
@@ -335,11 +425,7 @@ class _ExplorePageState extends State<ExplorePage> {
                   ),
                 ],
               ),
-              child: CircleAvatar(
-                radius: 30, 
-                backgroundColor: Colors.white,
-                backgroundImage: AssetImage(imagePath)
-              ),
+              child: CircleAvatar(radius: 30, backgroundColor: Colors.white, backgroundImage: AssetImage(imagePath)),
             ),
             const SizedBox(height: 8),
             Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
@@ -370,11 +456,12 @@ class _ExplorePageState extends State<ExplorePage> {
     );
   }
 
-  Widget _buildPopularCard(String category, String name, String loc, String imagePath, String time, String duration, String coach) {
+  Widget _buildPopularCard(String category, String name, String loc, String imagePath, String time,
+      String duration, String coach) {
     return Container(
-      width: 220, 
-      height: 320, 
-      margin: const EdgeInsets.only(right: 15, bottom: 15), 
+      width: 220,
+      height: 320,
+      margin: const EdgeInsets.only(right: 15, bottom: 15),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
@@ -409,14 +496,16 @@ class _ExplorePageState extends State<ExplorePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(category, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
+                  Text(category,
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
                   const SizedBox(height: 5),
                   Text("$name, $loc", style: const TextStyle(color: Colors.white70, fontSize: 13)),
                   const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("$time | $duration\nMins", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                      Text("$time | $duration\nMins",
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
                       Text(coach, style: const TextStyle(color: Colors.white, fontSize: 14)),
                     ],
                   ),
@@ -465,20 +554,11 @@ class _ExplorePageState extends State<ExplorePage> {
       onPressed: () {
         if (isActive) return;
         if (index == 0) {
-          Navigator.pushReplacement(
-            context, 
-            MaterialPageRoute(builder: (context) => HomePage(userName: widget.userName))
-          );
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(userName: widget.userName)));
         } else if (index == 2) {
-          Navigator.pushReplacement(
-            context, 
-            MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName))
-          );
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
         } else if (index == 3) {
-          Navigator.pushReplacement(
-            context, 
-            MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName))
-          );
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
         }
       },
       child: Column(

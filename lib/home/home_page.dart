@@ -77,9 +77,79 @@ class _HomePageState extends State<HomePage> {
         height: 60,
         child: FloatingActionButton(
           onPressed: () {
+            String title = "CoreFit Spa";
+            String date = "24 May";
+            String time = "11:00 AM";
+
+            if (NotifPage.notifications.isNotEmpty) {
+              final firstBooking = NotifPage.notifications.first;
+              title = (firstBooking["title"] ?? "CoreFit Spa").toString();
+              date = (firstBooking["date"] ?? "24 May").toString();
+              time = (firstBooking["time"] ?? "11:00 AM").toString();
+            }
+
+            String assetImage = "assets/spa.JPG";
+            String type = "SPA";
+            String titleLower = title.toLowerCase();
+
+            if (titleLower.contains("yoga")) {
+              assetImage = "assets/yoga.JPG";
+              type = "YOGA";
+            } else if (titleLower.contains("hiit")) {
+              assetImage = "assets/hiit.JPG";
+              type = "HIIT";
+            } else if (titleLower.contains("pilates")) {
+              assetImage = "assets/pilates.JPG";
+              type = "PILATES";
+            } else if (titleLower.contains("massage")) {
+              assetImage = "assets/massage.JPG";
+              type = "MASSAGE";
+            } else if (titleLower.contains("spa")) {
+              assetImage = "assets/spa.JPG";
+              type = "SPA";
+            } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
+              assetImage = "assets/fisioterapi.JPG";
+              type = "PHYSIOTHERAPY";
+            } else if (titleLower.contains("gym")) {
+              assetImage = "assets/gymuntar.jpg";
+              type = "GYM";
+            }
+
+            int dayNum = 24;
+            final RegExp matchDay = RegExp(r'^\d+');
+            if (matchDay.hasMatch(date)) {
+              dayNum = int.parse(matchDay.stringMatch(date)!);
+            }
+            
+            String monthYear = date.replaceFirst(matchDay, '').trim();
+            if (monthYear.contains(",")) {
+              monthYear = monthYear.split(",").first.trim();
+            }
+
+            if (monthYear.isEmpty) {
+              monthYear = "May 2026";
+            } else if (!monthYear.contains("2026")) {
+              monthYear = "$monthYear 2026";
+            }
+            
+            String finalBookingRange = "$dayNum $monthYear";
+
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CheckInPage()),
+              MaterialPageRoute(
+                builder: (context) => CheckInPage(
+                  dateString: "$date, $time",
+                  gymName: title,
+                  location: "Jakarta",
+                  rating: 4.9,
+                  imagePath: assetImage,
+                  bookingDates: finalBookingRange,
+                  roomType: type,
+                  phoneNumber: "0214345646",
+                  status: "Pending",
+                  guestInfo: "2 Guests (1 Room)",
+                ),
+              ),
             );
           },
           backgroundColor: Colors.white,
@@ -312,7 +382,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildWeeklyTarget() {
-    int currentStreak = 3;
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -332,7 +401,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween, 
               children: List.generate(7, (i) {
                 int dayNumber = i + 1;
-                return _dayCircle(dayNumber <= currentStreak, dayNumber, dayNumber == currentStreak);
+                return _dayCircle(dayNumber <= 3, dayNumber, dayNumber == 3);
               }),
             ),
           ]
