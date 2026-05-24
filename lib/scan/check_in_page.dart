@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'history_page.dart';
 
 class CheckInPage extends StatelessWidget {
   final String dateString;
@@ -7,10 +8,10 @@ class CheckInPage extends StatelessWidget {
   final double rating;
   final String imagePath;
   final String bookingDates;
+  final String guestInfo;
   final String roomType;
   final String phoneNumber;
   final String status;
-  final String? guestInfo;
 
   const CheckInPage({
     super.key,
@@ -20,10 +21,10 @@ class CheckInPage extends StatelessWidget {
     required this.rating,
     required this.imagePath,
     required this.bookingDates,
+    required this.guestInfo,
     required this.roomType,
     required this.phoneNumber,
     required this.status,
-    this.guestInfo,
   });
 
   @override
@@ -118,7 +119,7 @@ class CheckInPage extends StatelessWidget {
                       const SizedBox(height: 30),
                       _buildQRCodeSection(),
                       const SizedBox(height: 30),
-                      _buildActionButtons(),
+                      _buildActionButtons(context),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -273,6 +274,8 @@ class CheckInPage extends StatelessWidget {
         children: [
           _buildDetailRow(Icons.calendar_today_outlined, "Dates", bookingDates),
           const Divider(height: 24, color: Color(0xFFF5F5F5)),
+          _buildDetailRow(Icons.person_outline, "Guest", guestInfo),
+          const Divider(height: 24, color: Color(0xFFF5F5F5)),
           _buildDetailRow(Icons.business_outlined, "Room type", roomType),
           const Divider(height: 24, color: Color(0xFFF5F5F5)),
           _buildDetailRow(Icons.phone_outlined, "Phone", phoneNumber),
@@ -336,42 +339,52 @@ class CheckInPage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildBottomAction(Icons.login, "Check - In", true),
-        _buildBottomAction(Icons.history, "History", false),
-        _buildBottomAction(Icons.logout, "Check - Out", false),
+        _buildBottomAction(context, Icons.login, "Check - In", true, () {}),
+        _buildBottomAction(context, Icons.history, "History", false, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HistoryPage(),
+            ),
+          );
+        }),
+        _buildBottomAction(context, Icons.logout, "Check - Out", false, () {}),
       ],
     );
   }
 
-  Widget _buildBottomAction(IconData icon, String label, bool isActive) {
-    return Container(
-      width: 100,
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF42A5F5) : const Color(0xFFFFF0F0),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? Colors.white : Colors.black,
-          ),
-          const SizedBox(height: 5),
-          Text(
-            label,
-            style: TextStyle(
+  Widget _buildBottomAction(BuildContext context, IconData icon, String label, bool isActive, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 100,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isActive ? const Color(0xFF42A5F5) : const Color(0xFFFFF0F0),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
               color: isActive ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
             ),
-          ),
-        ],
+            const SizedBox(height: 5),
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
