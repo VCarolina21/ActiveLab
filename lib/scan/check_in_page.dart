@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'history_page.dart';
+import 'check_out_page.dart';
 
 class CheckInPage extends StatelessWidget {
   final String dateString;
@@ -8,10 +9,10 @@ class CheckInPage extends StatelessWidget {
   final double rating;
   final String imagePath;
   final String bookingDates;
-  final String guestInfo;
   final String roomType;
   final String phoneNumber;
   final String status;
+  final String? guestInfo;
 
   const CheckInPage({
     super.key,
@@ -21,10 +22,10 @@ class CheckInPage extends StatelessWidget {
     required this.rating,
     required this.imagePath,
     required this.bookingDates,
-    required this.guestInfo,
     required this.roomType,
     required this.phoneNumber,
     required this.status,
+    this.guestInfo,
   });
 
   @override
@@ -274,8 +275,6 @@ class CheckInPage extends StatelessWidget {
         children: [
           _buildDetailRow(Icons.calendar_today_outlined, "Dates", bookingDates),
           const Divider(height: 24, color: Color(0xFFF5F5F5)),
-          _buildDetailRow(Icons.person_outline, "Guest", guestInfo),
-          const Divider(height: 24, color: Color(0xFFF5F5F5)),
           _buildDetailRow(Icons.business_outlined, "Room type", roomType),
           const Divider(height: 24, color: Color(0xFFF5F5F5)),
           _buildDetailRow(Icons.phone_outlined, "Phone", phoneNumber),
@@ -352,12 +351,24 @@ class CheckInPage extends StatelessWidget {
             ),
           );
         }),
-        _buildBottomAction(context, Icons.logout, "Check - Out", false, () {}),
+        _buildBottomAction(context, Icons.logout, "Check - Out", false, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CheckOutPage(
+                bookingDates: bookingDates,
+                roomType: roomType,
+                phoneNumber: phoneNumber,
+              ),
+            ),
+          );
+        }),
       ],
     );
   }
 
-  Widget _buildBottomAction(BuildContext context, IconData icon, String label, bool isActive, VoidCallback onTap) {
+  Widget _buildBottomAction(
+      BuildContext context, IconData icon, String label, bool isActive, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
