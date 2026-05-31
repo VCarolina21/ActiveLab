@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../interest/interest_page.dart';
+import '../services/api_service.dart';
+import '../home/home_page.dart'; // Kalau letaknya di folder lib
 
 class RealLoginPage extends StatefulWidget {
   const RealLoginPage({super.key});
@@ -9,31 +10,50 @@ class RealLoginPage extends StatefulWidget {
 }
 
 class _RealLoginPageState extends State<RealLoginPage> {
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  bool _nameError = false;
+  bool _emailError = false;
   bool _passwordError = false;
 
-  void _handleLogin() {
+  void _handleLogin() async {
     setState(() {
-      _nameError = _nameController.text.isEmpty;
+      _emailError = _emailController.text.isEmpty;
       _passwordError = _passwordController.text.isEmpty;
     });
 
-    if (!_nameError && !_passwordError) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => InterestPage(userName: _nameController.text),
-        ),
-      );
+    if (!_emailError && !_passwordError) {
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+
+      print("Mencoba login...");
+      bool isSuccess = await ApiService.login(email, password);
+
+      if (isSuccess) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login Berhasil! 🚀')),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(userName: '',), // Ganti dengan nama halaman Home/Landing kamu
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login Gagal! Cek email & password.')),
+          );
+        }
+      }
     }
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -112,9 +132,9 @@ class _RealLoginPageState extends State<RealLoginPage> {
                           ),
                           const SizedBox(height: 30),
                           _buildInputField(
-                            hint: "Name",
-                            controller: _nameController,
-                            isError: _nameError,
+                            hint: "Email",
+                            controller: _emailController,
+                            isError: _emailError,
                           ),
                           const SizedBox(height: 15),
                           _buildInputField(

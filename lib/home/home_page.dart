@@ -10,6 +10,7 @@ import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
 import '../profile/profile_page.dart';
 
+
 class HomePage extends StatefulWidget {
   final String userName;
   const HomePage({super.key, required this.userName});

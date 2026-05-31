@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'notif_page.dart';
+import '../services/api_service.dart';
+
 
 class ChatMentorPage extends StatefulWidget {
   final String mentorName;
@@ -237,7 +239,7 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  void _handleBooking() {
+  void _handleBooking() async {
     final selectedData = dates[selectedDateIndex];
     final now = DateTime.now();
     final year = now.year.toString();
@@ -247,24 +249,43 @@ class _DetailPageState extends State<DetailPage> {
     ];
     final monthName = months[now.month - 1];
 
-    NotifPage.addNotification(
-      widget.title, 
-      selectedData["date"]!, 
-      monthName, 
-      year, 
-      times[selectedTimeIndex]
-    );
+    Map<String, dynamic> dataYangDikirim = {
+      "service": widget.title,
+      "location": widget.location,
+      "date": "${selectedData["date"]} $monthName $year",
+      "time": times[selectedTimeIndex],
+      "mentor_name": widget.mentorName,
+    };
 
-    setState(() {
-      isBooked = true;
-    });
+    // Tembak ke Backend!
+    bool isSuccess = await ApiService.createBooking(dataYangDikirim);
 
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      }
-    });
-  }
+    if (isSuccess) {
+      NotifPage.addNotification(
+        widget.title,
+        selectedData["date"]!,
+        monthName,
+        year,
+        times[selectedTimeIndex]
+      );
+
+      setState(() {
+        isBooked = true;
+      });
+
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      });
+    } else {
+      // Kalau gagal, munculkan peringatan
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Gagal booking, pastikan Backend menyala!")),
+      );
+    }
+    }
+  
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../services/api_service.dart';
 import 'real_login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -23,7 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _showPasswordError = false;
   bool _showPhoneError = false;
 
-  void _validateAndContinue() {
+  void _validateAndContinue() async {
     setState(() {
       _showNameError = _nameController.text.isEmpty;
       _showEmailError = _emailController.text.isEmpty;
@@ -37,10 +37,31 @@ class _RegisterPageState extends State<RegisterPage> {
         !_showPasswordError &&
         !_showPhoneError &&
         !_showGenderError) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const RealLoginPage()),
-      );
+      
+      String name = _nameController.text.trim();
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+
+      print("Mencoba mendaftarkan user baru...");
+      bool isSuccess = await ApiService.register(name, email, password);
+
+      if (isSuccess) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Akun berhasil dibuat! Silakan Login.')),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const RealLoginPage()),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Gagal register! Email mungkin sudah dipakai/Backend mati.')),
+          );
+        }
+      }
     }
   }
 
@@ -70,7 +91,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             child: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(context), // Tombol back kembali normal
             ),
           ),
         ),
