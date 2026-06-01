@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
-import 'real_login_page.dart';
+import '../interest/interest_page.dart';
+import '../sign_in/real_login_page.dart'; 
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -17,11 +20,26 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? _selectedGender;
   
+  // Variabel untuk menangani Foto Profil
+  File? _profileImage;
+  final ImagePicker _picker = ImagePicker();
+  
   bool _showGenderError = false;
   bool _showNameError = false;
   bool _showEmailError = false;
   bool _showPasswordError = false;
   bool _showPhoneError = false;
+  bool _isLoading = false; 
+
+  // Fungsi untuk Membuka Galeri HP
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
+  }
 
   void _validateAndContinue() async {
     setState(() {
@@ -41,26 +59,59 @@ class _RegisterPageState extends State<RegisterPage> {
       String name = _nameController.text.trim();
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
+      String phone = _phoneController.text.trim();
+      String gender = _selectedGender!; 
 
-      print("Mencoba mendaftarkan user baru...");
-      bool isSuccess = await ApiService.register(name, email, password);
+      print("Mencoba mendaftarkan user baru dengan foto...");
+      
+      setState(() {
+        _isLoading = true; 
+      });
 
-      if (isSuccess) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Akun berhasil dibuat! Silakan Login.')),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const RealLoginPage()),
-          );
-        }
+      // Panggil fungsi register dengan parameter foto tambahan (_profileImage)
+      String result = await ApiService.register(name, email, password, phone, gender, _profileImage);
+
+      // 👇👇👇 TAMBAHKAN 3 BARIS INI 👇👇👇
+      if (result == "SUCCESS") {
+        // Lakukan "Auto-Login" diam-diam agar aplikasi langsung mengingat foto & email-mu!
+        await ApiService.login(email, password);
+      }
+      // 👆👆👆 SAMPAI SINI 👆👆👆
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false; 
+      });
+
+      if (result == "SUCCESS") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Akun berhasil dibuat! Silakan pilih preferensi.'), backgroundColor: Colors.green),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => InterestPage(userName: name, email: email)),
+        );
+      } else if (result == "DUPLICATE") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registrasi Gagal: Email atau Nomor HP sudah terdaftar!'), backgroundColor: Colors.orange),
+        );
+      } else if (result == "SERVER_ERROR") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Terjadi kesalahan internal pada server database.'), backgroundColor: Colors.red),
+        );
+      } else if (result == "BACKEND_DEAD") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Koneksi Gagal! Pastikan server backend sudah menyala.'), 
+            backgroundColor: Colors.black87,
+            duration: Duration(seconds: 4),
+          ),
+        );
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Gagal register! Email mungkin sudah dipakai/Backend mati.')),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Terjadi kesalahan yang tidak diketahui.'), backgroundColor: Colors.red),
+        );
       }
     }
   }
@@ -91,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             child: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
-              onPressed: () => Navigator.pop(context), // Tombol back kembali normal
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
@@ -105,10 +156,34 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.grey[300],
-              child: const Icon(Icons.person, size: 60, color: Colors.black),
+            
+            // --- BAGIAN FOTO PROFIL YANG BISA DIKLIK ---
+            GestureDetector(
+              onTap: _pickImage,
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey[300],
+                    // Jika ada gambar, tampilkan. Jika tidak, tetap abu-abu.
+                    backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                    // Jika belum ada gambar, tampilkan ikon orang standar
+                    child: _profileImage == null 
+                        ? const Icon(Icons.person, size: 60, color: Colors.black54) 
+                        : null,
+                  ),
+                  // Ikon kamera kecil di pojok kanan bawah
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
+                  )
+                ],
+              ),
             ),
             const SizedBox(height: 30),
             
@@ -159,7 +234,7 @@ class _RegisterPageState extends State<RegisterPage> {
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                  padding: EdgeInsets.only(left: 12),
+                  padding: const EdgeInsets.only(left: 12),
                   child: Text(
                     "* Please select your gender",
                     style: TextStyle(color: Colors.red, fontSize: 12),
@@ -175,14 +250,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 gradient: LinearGradient(
                   colors: (_selectedGender != null && 
                            _nameController.text.isNotEmpty &&
-                           _emailController.text.isNotEmpty)
+                           _emailController.text.isNotEmpty &&
+                           _passwordController.text.isNotEmpty &&
+                           _phoneController.text.isNotEmpty)
                     ? [const Color(0xFF90CAF9), const Color(0xFF4285F4)]
                     : [Colors.grey.shade400, Colors.grey.shade400]
                 ),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: ElevatedButton(
-                onPressed: _validateAndContinue,
+                onPressed: _isLoading ? null : _validateAndContinue, 
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
@@ -191,10 +268,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     borderRadius: BorderRadius.circular(25)
                   ),
                 ),
-                child: const Text(
-                  "Continue", 
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)
-                ),
+                child: _isLoading 
+                    ? const SizedBox(
+                        height: 20, 
+                        width: 20, 
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                      )
+                    : const Text(
+                        "Continue", 
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)
+                      ),
               ),
             ),
             const SizedBox(height: 40),

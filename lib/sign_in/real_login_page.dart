@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
-import '../home/home_page.dart'; // Kalau letaknya di folder lib
+// PENTING 1: Pastikan path import ini sesuai dengan lokasi file api_service.dart kamu!
+import '../services/api_service.dart'; 
+// PENTING 2: Pastikan path import ini sesuai dengan halaman Home/Landing kamu!
+import '../home/home_page.dart'; 
 
 class RealLoginPage extends StatefulWidget {
   const RealLoginPage({super.key});
@@ -10,219 +12,161 @@ class RealLoginPage extends StatefulWidget {
 }
 
 class _RealLoginPageState extends State<RealLoginPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  // Controller untuk menangkap teks yang diketik user
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  
+  bool isLoading = false; // Untuk animasi loading saat nunggu balasan dari server
 
-  bool _emailError = false;
-  bool _passwordError = false;
-
+  // FUNGSI UTAMA PENGECEKAN LOGIN
   void _handleLogin() async {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+
+    // Cegah user klik kalau form masih kosong
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Email dan password tidak boleh kosong!'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Nyalakan loading
     setState(() {
-      _emailError = _emailController.text.isEmpty;
-      _passwordError = _passwordController.text.isEmpty;
+      isLoading = true;
     });
 
-    if (!_emailError && !_passwordError) {
-      String email = _emailController.text.trim();
-      String password = _passwordController.text.trim();
+    // TEMBAK KE BACKEND! (Memanggil api_service.dart)
+    bool isSuccess = await ApiService.login(email, password);
 
-      print("Mencoba login...");
-      bool isSuccess = await ApiService.login(email, password);
+    // Matikan loading setelah backend membalas
+    setState(() {
+      isLoading = false;
+    });
 
-      if (isSuccess) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login Berhasil! 🚀')),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePage(userName: '',), // Ganti dengan nama halaman Home/Landing kamu
-            ),
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login Gagal! Cek email & password.')),
-          );
-        }
-      }
+    // Pengecekan hasil
+    if (isSuccess) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login Berhasil! 🎉'), backgroundColor: Colors.green),
+      );
+      
+      // Pindah ke halaman Home (Ganti HomePage() dengan nama class halaman utamamu)
+      Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (context) => HomePage(userName: ApiService.currentUserName ?? 'Member'),
+  ), 
+);
+    } else {
+      if (!mounted) return;
+      // Kalau gagal, cegah masuk dan beri peringatan
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login Gagal! Email tidak terdaftar atau Password salah.'), 
+          backgroundColor: Colors.red,
+        ),
+      );
     }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
-            stops: [0.0, 0.6],
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
-              ),
-              child: IntrinsicHeight(
+      backgroundColor: const Color(0xFF4A90E2), // Sesuaikan dengan warna biru ActiveLab kamu
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Bagian atas (Bisa disesuaikan kalau kamu pakai gambar logo khusus)
+            Expanded(
+              child: Center(
                 child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ),
-                      ),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      "A  L",
+                      style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.black),
                     ),
-                    const SizedBox(height: 10),
-                    Center(
-                      child: Image.asset(
-                        'assets/logoactivelab.png',
-                        width: 400,
-                        height: 250,
-                        fit: BoxFit.contain,
-                      ),
+                    Text(
+                      "ACTIVE LAB",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                     ),
-                    
-                    const Spacer(),
-
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(30, 40, 30, 60),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            "Login",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          _buildInputField(
-                            hint: "Email",
-                            controller: _emailController,
-                            isError: _emailError,
-                          ),
-                          const SizedBox(height: 15),
-                          _buildInputField(
-                            hint: "Password",
-                            isPassword: true,
-                            controller: _passwordController,
-                            isError: _passwordError,
-                          ),
-                          const SizedBox(height: 30),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 55,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF4285F4).withValues(alpha: 0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: ElevatedButton(
-                                onPressed: _handleLogin,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                ),
-                                child: const Text(
-                                  "Next",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    SizedBox(height: 8),
+                    Text(
+                      "PHYSIOTHERAPY & PAIN MANAGEMENT",
+                      style: TextStyle(fontSize: 10, color: Colors.black54, letterSpacing: 1.5),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
+            
+            // Bagian bawah (Card putih tempat form login)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text("Login", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 24),
+                  
+                  // INPUT EMAIL
+                  TextField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email', // Aku ubah jadi Email biar nggak salah masukin Nama
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // INPUT PASSWORD
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true, // Biar passwordnya jadi titik-titik
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  // TOMBOL LOGIN
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _handleLogin, // Kalau lagi loading, tombol dimatikan
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      ),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 24, 
+                              width: 24, 
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                            )
+                          : const Text("Next", style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildInputField({
-    required String hint,
-    bool isPassword = false,
-    required TextEditingController controller,
-    required bool isError,
-  }) {
-    return TextField(
-      controller: controller,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black38),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: isError ? Colors.red : Colors.black12),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: isError ? Colors.red : Colors.black12, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(
-            color: isError ? Colors.red : const Color(0xFF4285F4),
-            width: 1.5,
-          ),
-        ),
-        errorText: isError ? "* Required" : null,
       ),
     );
   }

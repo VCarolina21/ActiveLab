@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import '../services/api_service.dart';
 import '../home/home_page.dart';
 import '../explore/explore_page.dart';
 import '../chat/chat_page.dart';
@@ -21,6 +24,49 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String membershipDuration = "12 Month";
   String selectedPayment = "BCA";
+  
+  // Variabel untuk fitur Ganti Foto Profil
+  bool _isUploading = false;
+  String? _currentImageUrl = ApiService.currentUserImage; // Ambil foto dari sesi login
+  
+  // ─── FUNGSI UNTUK GANTI FOTO ───
+  Future<void> _pickAndUploadImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null && ApiService.currentUserEmail != null) {
+      setState(() {
+        _isUploading = true; // Munculkan indikator loading
+      });
+
+      File imageFile = File(pickedFile.path);
+      
+      // Kirim ke backend menggunakan fungsi yang kita buat di ApiService
+      String? newImagePath = await ApiService.updateProfilePhoto(ApiService.currentUserEmail!, imageFile);
+
+      setState(() {
+        _isUploading = false; // Matikan indikator loading
+      });
+
+      if (newImagePath != null) {
+        setState(() {
+          _currentImageUrl = newImagePath;
+          ApiService.currentUserImage = newImagePath; // Update data global juga
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Foto profil berhasil diupdate!'), backgroundColor: Colors.green),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Gagal mengupdate foto profil.'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+  }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -66,6 +112,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
+                          // Hapus data sesi login saat logout
+                          ApiService.currentUserId = null;
+                          ApiService.currentUserName = null;
+                          ApiService.currentUserEmail = null;
+                          ApiService.currentUserImage = null;
+                          
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(builder: (context) => const SignPage()),
@@ -261,6 +313,17 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // --- LOGIKA MENDAPATKAN URL GAMBAR ---
+  ImageProvider _getProfileImage() {
+    if (_currentImageUrl != null && _currentImageUrl!.isNotEmpty) {
+      // Menghapus "/api" dari baseUrl karena foldernya ada di "http://10.0.2.2:5000/uploads/..."
+      String serverUrl = ApiService.baseUrl.replaceAll('/api', '');
+      return NetworkImage('$serverUrl$_currentImageUrl');
+    } else {
+      return const AssetImage('assets/profile.JPG'); // Gambar default dari aset
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -397,11 +460,36 @@ class _ProfilePageState extends State<ProfilePage> {
                       Center(
                         child: Column(
                           children: [
-                            const CircleAvatar(
-                              radius: 60,
-                              backgroundColor: Colors.white,
-                              backgroundImage: AssetImage('assets/profile.JPG'),
+                            // ─── BAGIAN AVATAR DAN IKON PENSIL ───
+                            Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                CircleAvatar(
+                                  radius: 60,
+                                  backgroundColor: Colors.white,
+                                  backgroundImage: _getProfileImage(),
+                                  // Memunculkan efek loading berputar di atas foto saat diupload
+                                  child: _isUploading
+                                      ? const CircularProgressIndicator(color: Colors.white)
+                                      : null,
+                                ),
+                                if (!_isUploading) // Pensil hilang saat loading
+                                  GestureDetector(
+                                    onTap: _pickAndUploadImage,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF4285F4),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 2),
+                                      ),
+                                      child: const Icon(Icons.edit, color: Colors.white, size: 20),
+                                    ),
+                                  ),
+                              ],
                             ),
+                            // ────────────────────────────────────────
+
                             const SizedBox(height: 15),
                             Text(
                               widget.userName.isNotEmpty ? widget.userName : "User",

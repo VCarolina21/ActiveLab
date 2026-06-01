@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-
 import '../home/home_page.dart'; 
+import '../services/api_service.dart'; // PENTING: Pastikan path ini benar!
 
 class InterestPage extends StatefulWidget {
   final String userName; 
+  final String email; // Tambahan wadah untuk menerima email dari halaman Register
 
-  const InterestPage({super.key, required this.userName});
+  const InterestPage({super.key, required this.userName, required this.email});
 
   @override
   State<InterestPage> createState() => _InterestPageState();
@@ -13,20 +14,13 @@ class InterestPage extends StatefulWidget {
 
 class _InterestPageState extends State<InterestPage> {
   final List<String> _interests = [
-    "Spa",
-    "Strength Training",
-    "Hiit",
-    "Pilates",
-    "Plunge Pool",
-    "Gym",
-    "Cardio",
-    "Calisthenics",
-    "Physiotherapy",
-    "Personal Training"
+    "Spa", "Strength Training", "Hiit", "Pilates", "Plunge Pool", 
+    "Gym", "Cardio", "Calisthenics", "Physiotherapy", "Personal Training"
   ];
 
   final Set<String> _selectedInterests = {};
   bool _showError = false;
+  bool _isLoading = false; // Untuk animasi loading saat menyimpan
 
   void _showSuccessDialog() {
     showDialog(
@@ -42,20 +36,14 @@ class _InterestPageState extends State<InterestPage> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(15),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF81C784),
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: const BoxDecoration(color: Color(0xFF81C784), shape: BoxShape.circle),
                   child: const Icon(Icons.check, color: Colors.white, size: 45),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  "Success",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
+                const Text("Success", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 const Text(
-                  "Your Account is successfully\ncreated",
+                  "Your Account is successfully\ncreated and preferences saved!",
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.black54, fontSize: 14),
                 ),
@@ -65,9 +53,7 @@ class _InterestPageState extends State<InterestPage> {
                   height: 50,
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF90CAF9), Color(0xFF4285F4)],
-                      ),
+                      gradient: const LinearGradient(colors: [Color(0xFF90CAF9), Color(0xFF4285F4)]),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ElevatedButton(
@@ -75,24 +61,16 @@ class _InterestPageState extends State<InterestPage> {
                         Navigator.pop(context);
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => HomePage(userName: widget.userName),
-                          ),
+                          MaterialPageRoute(builder: (context) => HomePage(userName: widget.userName)),
                           (route) => false,
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text(
-                        "Continue",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
+                      child: const Text("Continue", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ),
@@ -104,6 +82,32 @@ class _InterestPageState extends State<InterestPage> {
     );
   }
 
+  // FUNGSI UNTUK MENYIMPAN KE DATABASE
+  void _saveInterests() async {
+    if (_selectedInterests.length < 3) {
+      setState(() => _showError = true);
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    // KEAJAIBAN TERJADI DI SINI: Mengubah Set klik-klikan menjadi 1 teks panjang
+    String interestsText = _selectedInterests.join(', ');
+
+    // Kirim teks tersebut ke Supabase lewat backend
+    bool isSuccess = await ApiService.updateInterests(widget.email, interestsText);
+
+    setState(() => _isLoading = false);
+
+    if (isSuccess) {
+      _showSuccessDialog(); // Kalau berhasil simpan, baru munculkan pop-up
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal menyimpan preferensi. Cek koneksi server.'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isSelectionValid = _selectedInterests.length >= 3;
@@ -113,17 +117,13 @@ class _InterestPageState extends State<InterestPage> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Konten Utama
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 80),
-                  const Text(
-                    "Choose Your Interest",
-                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                  ),
+                  const Text("Choose Your Interest", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 15),
                   const Text(
                     "Tell us what brings you to ActiveLab. We'll tailor the best classes and recovery sessions just for you.",
@@ -204,26 +204,15 @@ class _InterestPageState extends State<InterestPage> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (isSelectionValid) {
-                            _showSuccessDialog();
-                          } else {
-                            setState(() => _showError = true);
-                          }
-                        },
+                        onPressed: _isLoading ? null : _saveInterests, // Panggil fungsi simpan
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                         ),
-                        child: const Text(
-                          "Continue",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isLoading 
+                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : const Text("Continue", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),

@@ -269,6 +269,8 @@ class _DetailPageState extends State<DetailPage> {
         times[selectedTimeIndex]
       );
 
+      if (!mounted) return;
+
       setState(() {
         isBooked = true;
       });
