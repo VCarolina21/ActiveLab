@@ -1,0 +1,493 @@
+import 'package:flutter/material.dart';
+import 'dart:math'; 
+
+import 'notif_page.dart';
+import 'start_page.dart';
+import 'detail_page.dart';
+import 'weekly_target_page.dart';
+import '../scan/check_in_page.dart';
+import '../explore/explore_page.dart';
+import '../chat/chat_page.dart';
+import '../profile/profile_page.dart';
+
+
+class HomePage extends StatefulWidget {
+  final String userName;
+  const HomePage({super.key, required this.userName});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String selectedCategory = "All";
+  final Random _random = Random();
+
+  final List<Map<String, String>> allLocations = [
+    {"name": "ActiveFit Gym", "loc": "Jakarta Utara", "type": "Gym", "img": "assets/gymuntar.jpg"},
+    {"name": "ActiveFit Spa", "loc": "Jakarta Utara", "type": "Spa", "img": "assets/spa.JPG"},
+    {"name": "ActiveFit Pilates", "loc": "Jakarta Utara", "type": "Pilates", "img": "assets/pilates.JPG"},
+    {"name": "ActiveFit Yoga", "loc": "Jakarta Utara", "type": "Yoga", "img": "assets/yoga.JPG"},
+    {"name": "ActiveFit Massage", "loc": "Jakarta Utara", "type": "Massage", "img": "assets/massage.JPG"},
+    {"name": "ActiveFit Physiotherapy", "loc": "Jakarta Utara", "type": "Physiotherapy", "img": "assets/fisioterapi.JPG"},
+    {"name": "ActiveFit Hiit", "loc": "Jakarta Utara", "type": "Hiit", "img": "assets/hiit.JPG"},
+
+    {"name": "MoveFit Gym", "loc": "Jakarta Barat", "type": "Gym", "img": "assets/gymuntar.jpg"},
+    {"name": "MoveFit Spa", "loc": "Jakarta Barat", "type": "Spa", "img": "assets/spa.JPG"},
+    {"name": "MoveFit Pilates", "loc": "Jakarta Barat", "type": "Pilates", "img": "assets/pilates.JPG"},
+    {"name": "MoveFit Yoga", "loc": "Jakarta Barat", "type": "Yoga", "img": "assets/yoga.JPG"},
+    {"name": "MoveFit Massage", "loc": "Jakarta Barat", "type": "Massage", "img": "assets/massage.JPG"},
+    {"name": "MoveFit Physiotherapy", "loc": "Jakarta Barat", "type": "Physiotherapy", "img": "assets/fisioterapi.JPG"},
+    {"name": "MoveFit Hiit", "loc": "Jakarta Barat", "type": "Hiit", "img": "assets/hiit.JPG"},
+
+    {"name": "FlexFit Gym", "loc": "Jakarta Pusat", "type": "Gym", "img": "assets/gymuntar.jpg"},
+    {"name": "FlexFit Spa", "loc": "Jakarta Pusat", "type": "Spa", "img": "assets/spa.JPG"},
+    {"name": "FlexFit Pilates", "loc": "Jakarta Pusat", "type": "Pilates", "img": "assets/pilates.JPG"},
+    {"name": "FlexFit Yoga", "loc": "Jakarta Pusat", "type": "Yoga", "img": "assets/yoga.JPG"},
+    {"name": "FlexFit Massage", "loc": "Jakarta Pusat", "type": "Massage", "img": "assets/massage.JPG"},
+    {"name": "FlexFit Physiotherapy", "loc": "Jakarta Pusat", "type": "Physiotherapy", "img": "assets/fisioterapi.JPG"},
+    {"name": "FlexFit Hiit", "loc": "Jakarta Pusat", "type": "Hiit", "img": "assets/hiit.JPG"},
+
+    {"name": "CoreFit Gym", "loc": "Jakarta Selatan", "type": "Gym", "img": "assets/gymuntar.jpg"},
+    {"name": "CoreFit Spa", "loc": "Jakarta Selatan", "type": "Spa", "img": "assets/spa.JPG"},
+    {"name": "CoreFit Pilates", "loc": "Jakarta Selatan", "type": "Pilates", "img": "assets/pilates.JPG"},
+    {"name": "CoreFit Yoga", "loc": "Jakarta Selatan", "type": "Yoga", "img": "assets/yoga.JPG"},
+    {"name": "CoreFit Massage", "loc": "Jakarta Selatan", "type": "Massage", "img": "assets/massage.JPG"},
+    {"name": "CoreFit Physiotherapy", "loc": "Jakarta Selatan", "type": "Physiotherapy", "img": "assets/fisioterapi.JPG"},
+    {"name": "CoreFit Hiit", "loc": "Jakarta Selatan", "type": "Hiit", "img": "assets/hiit.JPG"},
+  ];
+
+  final List<String> categories = ["All", "Physiotherapy", "Gym", "Hiit", "Massage", "Pilates", "Spa", "Yoga"];
+
+  @override
+  void initState() {
+    super.initState();
+    allLocations.shuffle();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Map<String, String>> filteredList = selectedCategory == "All"
+        ? allLocations
+        : allLocations.where((item) => item['type'] == selectedCategory).toList();
+
+    return Scaffold(
+      extendBody: true,
+      floatingActionButton: SizedBox(
+        width: 60,
+        height: 60,
+        child: FloatingActionButton(
+          onPressed: () {
+            String title = "CoreFit Spa";
+            String date = "24 May";
+            String time = "11:00 AM";
+
+            if (NotifPage.notifications.isNotEmpty) {
+              final firstBooking = NotifPage.notifications.first;
+              title = (firstBooking["title"] ?? "CoreFit Spa").toString();
+              date = (firstBooking["date"] ?? "24 May").toString();
+              time = (firstBooking["time"] ?? "11:00 AM").toString();
+            }
+
+            String assetImage = "assets/spa.JPG";
+            String type = "SPA";
+            String titleLower = title.toLowerCase();
+
+            if (titleLower.contains("yoga")) {
+              assetImage = "assets/yoga.JPG";
+              type = "YOGA";
+            } else if (titleLower.contains("hiit")) {
+              assetImage = "assets/hiit.JPG";
+              type = "HIIT";
+            } else if (titleLower.contains("pilates")) {
+              assetImage = "assets/pilates.JPG";
+              type = "PILATES";
+            } else if (titleLower.contains("massage")) {
+              assetImage = "assets/massage.JPG";
+              type = "MASSAGE";
+            } else if (titleLower.contains("spa")) {
+              assetImage = "assets/spa.JPG";
+              type = "SPA";
+            } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
+              assetImage = "assets/fisioterapi.JPG";
+              type = "PHYSIOTHERAPY";
+            } else if (titleLower.contains("gym")) {
+              assetImage = "assets/gymuntar.jpg";
+              type = "GYM";
+            }
+
+            int dayNum = 24;
+            final RegExp matchDay = RegExp(r'^\d+');
+            if (matchDay.hasMatch(date)) {
+              dayNum = int.parse(matchDay.stringMatch(date)!);
+            }
+            
+            String monthYear = date.replaceFirst(matchDay, '').trim();
+            if (monthYear.contains(",")) {
+              monthYear = monthYear.split(",").first.trim();
+            }
+
+            if (monthYear.isEmpty) {
+              monthYear = "May 2026";
+            } else if (!monthYear.contains("2026")) {
+              monthYear = "$monthYear 2026";
+            }
+            
+            String finalBookingRange = "$dayNum $monthYear";
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CheckInPage(
+                  dateString: "$date, $time",
+                  gymName: title,
+                  location: "Jakarta",
+                  rating: 4.9,
+                  imagePath: assetImage,
+                  bookingDates: finalBookingRange,
+                  roomType: type,
+                  phoneNumber: "0214345646",
+                  status: "Pending",
+                  guestInfo: "2 Guests (1 Room)",
+                ),
+              ),
+            );
+          },
+          backgroundColor: Colors.white,
+          elevation: 4,
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.crop_free,
+            color: Colors.black,
+            size: 30,
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF0D47A1),
+              Color(0xFF42A5F5),
+              Color(0xFFB3E5FC),
+              Colors.white,
+            ],
+            stops: [0.0, 0.25, 0.5, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                _buildHeader(context),
+                const SizedBox(height: 25),
+                _buildChallengeCard(),
+                const SizedBox(height: 25),
+                _buildWeeklyTarget(),
+                const SizedBox(height: 25),
+                const Text("Explore ActiveLab", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                const SizedBox(height: 15),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(children: categories.map((cat) => _buildChip(cat)).toList()),
+                ),
+                const SizedBox(height: 20),
+                Column(
+                  children: filteredList.map((data) {
+                    double randomRate = 3.7 + _random.nextDouble() * 1.3;
+                    int curCap = _random.nextInt(51); 
+                    
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: _buildGymCard(
+                        context,
+                        data['name']!, 
+                        data['loc']!, 
+                        randomRate.toStringAsFixed(1), 
+                        "$curCap/50", 
+                        data['img']!
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 100), 
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: _buildBottomNav(context),
+    );
+  }
+
+  Widget _buildChip(String label) {
+    bool isSelected = selectedCategory == label;
+    return GestureDetector(
+      onTap: () => setState(() => selectedCategory = label),
+      child: Container(
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF4285F4) : const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isSelected ? [BoxShadow(color: Colors.blue.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+        ),
+        child: Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.black54, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+      ),
+    );
+  }
+
+  Widget _buildGymCard(BuildContext context, String name, String loc, String rating, String capacity, String imagePath) {
+    String mentorName = "Woody";
+    String mentorRole = "MoveFit Mentor";
+
+    if (name.toLowerCase().contains("active")) {
+      mentorName = "Gerry";
+      mentorRole = "ActiveFit Mentor";
+    } else if (name.toLowerCase().contains("flex")) {
+      mentorName = "Sonia";
+      mentorRole = "FlexFit Mentor";
+    } else if (name.toLowerCase().contains("core")) {
+      mentorName = "Alan";
+      mentorRole = "CoreFit Mentor";
+    }
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(
+              title: name,
+              location: loc,
+              rating: double.parse(rating),
+              imagePath: imagePath,
+              quota: capacity,
+              mentorName: mentorName,
+              mentorRole: mentorRole,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            )
+          ],
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 80,
+                height: 80,
+                child: Image.asset(imagePath, fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(color: Colors.grey[200], child: const Icon(Icons.image))),
+              ),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 4),
+                  Row(children: [const Icon(Icons.location_on, size: 14, color: Colors.grey), const SizedBox(width: 4), Text(loc, style: const TextStyle(color: Colors.grey, fontSize: 12))]),
+                  const SizedBox(height: 8),
+                  Text(capacity, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4285F4))),
+                ],
+              ),
+            ),
+            Row(children: [const Icon(Icons.star, color: Colors.amber, size: 18), const SizedBox(width: 4), Text(rating, style: const TextStyle(fontWeight: FontWeight.bold))]),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      children: [
+        const CircleAvatar(radius: 25, backgroundColor: Colors.white, child: Icon(Icons.person, color: Colors.black)),
+        const SizedBox(width: 12),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 14)),
+          Text(widget.userName.isNotEmpty ? widget.userName : "User", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+        ]),
+        const Spacer(),
+        GestureDetector(
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotifPage())),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]),
+            child: const Icon(Icons.notifications_none_outlined, color: Colors.blue),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChallengeCard() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 25, offset: const Offset(0, 12))]),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF64B5F6), Color(0xFF1976D2)])),
+          child: Stack(children: [
+            Positioned(right: -210, bottom: -45, child: Image.asset('assets/duduk.png', width: 700, fit: BoxFit.contain)),
+            Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text("30 Days", style: TextStyle(color: Colors.white70)),
+              const Text("WHOLE BODY\nCHALLENGE", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
+              const SizedBox(height: 15),
+              const Text("40% complete", style: TextStyle(color: Colors.white, fontSize: 12)),
+              const SizedBox(height: 5),
+              _progressBar(),
+              const Text("DAY 3", style: TextStyle(color: Colors.white, fontSize: 60, fontWeight: FontWeight.w900)),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const StartPage()),
+                  );
+                }, 
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF1976D2)), 
+                child: const Text("START")
+              ),
+            ])),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _progressBar() {
+    return Container(width: 120, height: 8, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(5)),
+      child: FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: 0.4, child: Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)))));
+  }
+
+  Widget _buildWeeklyTarget() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const WeeklyTargetPage()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("WEEKLY TARGET", style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 15), 
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+              children: List.generate(7, (i) {
+                int dayNumber = i + 1;
+                return _dayCircle(dayNumber <= 3, dayNumber, dayNumber == 3);
+              }),
+            ),
+          ]
+        ),
+      ),
+    );
+  }
+
+  Widget _dayCircle(bool isReached, int day, bool showFire) {
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: 35, height: 35, 
+          decoration: BoxDecoration(
+            shape: BoxShape.circle, 
+            color: isReached ? const Color(0xFFE3F2FD) : Colors.transparent, 
+            border: Border.all(color: isReached ? const Color(0xFF4285F4) : Colors.grey[300]!)
+          ),
+          child: Center(child: Text("$day", style: TextStyle(color: isReached ? const Color(0xFF4285F4) : Colors.grey, fontWeight: isReached ? FontWeight.bold : FontWeight.normal))),
+        ),
+        if (showFire)
+          const Positioned(top: -12, right: -5, child: Icon(Icons.local_fire_department_rounded, color: Color(0xFF4285F4), size: 20)),
+      ],
+    );
+  }
+
+  Widget _buildBottomNav(BuildContext context) {
+    return BottomAppBar(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      height: 70,
+      shape: const CircularNotchedRectangle(),
+      notchMargin: 12.0,
+      color: Colors.white,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _navItem(context, Icons.home_filled, "Home", true, 0),
+              _navItem(context, Icons.search, "Explore", false, 1),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _navItem(context, Icons.chat_bubble_outline, "Chat", false, 2),
+              _navItem(context, Icons.person_outline, "Profile", false, 3),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _navItem(BuildContext context, IconData icon, String label, bool isActive, int index) {
+    return MaterialButton(
+      minWidth: 40,
+      onPressed: () {
+        if (isActive) return;
+        if (index == 1) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName)));
+        } else if (index == 2) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
+        } else if (index == 3) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: isActive ? const Color(0xFF4285F4) : Colors.grey),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isActive ? const Color(0xFF4285F4) : Colors.grey,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
