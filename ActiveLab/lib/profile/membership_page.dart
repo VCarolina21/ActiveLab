@@ -15,11 +15,7 @@ class _MembershipPageState extends State<MembershipPage> {
   bool _isLoading = true;
   String? _errorMsg;
 
-  final formatter = NumberFormat.currency(
-    locale: 'id_ID',
-    symbol: 'Rp ',
-    decimalDigits: 0,
-  );
+  final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
   @override
   void initState() {
@@ -28,19 +24,12 @@ class _MembershipPageState extends State<MembershipPage> {
   }
 
   Future<void> _loadMemberships() async {
-    setState(() {
-      _isLoading = true;
-      _errorMsg = null;
-    });
+    setState(() { _isLoading = true; _errorMsg = null; });
     try {
       final data = await MembershipApiService.getUserMemberships();
-      setState(() {
-        _memberships = data;
-      });
+      setState(() { _memberships = data; });
     } catch (e) {
-      setState(() {
-        _errorMsg = e.toString().replaceFirst('Exception: ', '');
-      });
+      setState(() { _errorMsg = e.toString().replaceFirst('Exception: ', ''); });
     } finally {
       setState(() => _isLoading = false);
     }
@@ -63,12 +52,10 @@ class _MembershipPageState extends State<MembershipPage> {
 
   void _showSnack(String msg, {bool isError = false}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: isError ? Colors.red : Colors.green,
-      ),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      backgroundColor: isError ? Colors.red : Colors.green,
+    ));
   }
 
   void _showUpgradeSheet(UserMembershipModel um) async {
@@ -112,10 +99,7 @@ class _MembershipPageState extends State<MembershipPage> {
           _showSnack("Membership berhasil di-downgrade");
           _loadMemberships();
         } catch (e) {
-          _showSnack(
-            e.toString().replaceFirst('Exception: ', ''),
-            isError: true,
-          );
+          _showSnack(e.toString().replaceFirst('Exception: ', ''), isError: true);
         }
       },
     );
@@ -137,10 +121,7 @@ class _MembershipPageState extends State<MembershipPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 15),
             ...options.map((opt) {
               final price = double.tryParse(opt['price'].toString()) ?? 0;
@@ -160,31 +141,21 @@ class _MembershipPageState extends State<MembershipPage> {
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4285F4),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           "Lv ${opt['level']}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           opt['name'] as String,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                         ),
                       ),
                       Text(
@@ -229,47 +200,36 @@ class _MembershipPageState extends State<MembershipPage> {
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF4285F4)),
-            )
-          : _errorMsg != null
+        ? const Center(child: CircularProgressIndicator(color: Color(0xFF4285F4)))
+        : _errorMsg != null
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(_errorMsg!, style: const TextStyle(color: Colors.grey)),
                   const SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: _loadMemberships,
-                    child: const Text("Coba Lagi"),
-                  ),
+                  ElevatedButton(onPressed: _loadMemberships, child: const Text("Coba Lagi")),
                 ],
               ),
             )
           : _memberships.isEmpty
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.card_membership, size: 60, color: Colors.grey),
-                  SizedBox(height: 15),
-                  Text(
-                    "Belum ada membership aktif",
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "Beli membership dari halaman Explore",
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                ],
+            ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.card_membership, size: 60, color: Colors.grey),
+                    SizedBox(height: 15),
+                    Text("Belum ada membership aktif", style: TextStyle(color: Colors.grey, fontSize: 16)),
+                    SizedBox(height: 8),
+                    Text("Beli membership dari halaman Explore", style: TextStyle(color: Colors.grey, fontSize: 13)),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.all(20),
+                itemCount: _memberships.length,
+                itemBuilder: (_, i) => _buildMembershipCard(_memberships[i]),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: _memberships.length,
-              itemBuilder: (_, i) => _buildMembershipCard(_memberships[i]),
-            ),
     );
   }
 
@@ -286,7 +246,7 @@ class _MembershipPageState extends State<MembershipPage> {
             color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 15,
             offset: const Offset(0, 5),
-          ),
+          )
         ],
       ),
       child: Column(
@@ -297,12 +257,10 @@ class _MembershipPageState extends State<MembershipPage> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isFrozen
-                    ? [Colors.grey.shade400, Colors.grey.shade600]
-                    : [const Color(0xFF0D47A1), const Color(0xFF42A5F5)],
+                  ? [Colors.grey.shade400, Colors.grey.shade600]
+                  : [const Color(0xFF0D47A1), const Color(0xFF42A5F5)],
               ),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Row(
               children: [
@@ -312,43 +270,27 @@ class _MembershipPageState extends State<MembershipPage> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.25),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             "Level ${um.level}",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                           ),
                         ),
                         if (isFrozen) ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: Colors.lightBlueAccent.withValues(
-                                alpha: 0.4,
-                              ),
+                              color: Colors.lightBlueAccent.withValues(alpha: 0.4),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Text(
                               "❄️ Frozen",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -366,10 +308,7 @@ class _MembershipPageState extends State<MembershipPage> {
                     const SizedBox(height: 2),
                     Text(
                       um.branchName,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
                     ),
                   ],
                 ),
@@ -379,11 +318,7 @@ class _MembershipPageState extends State<MembershipPage> {
                   children: [
                     Text(
                       "${um.daysRemaining}",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
                     ),
                     const Text(
                       "hari tersisa",
@@ -484,14 +419,7 @@ class _MembershipPageState extends State<MembershipPage> {
           children: [
             Icon(icon, color: color, size: 16),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-              ),
-            ),
+            Text(label, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13)),
           ],
         ),
       ),
