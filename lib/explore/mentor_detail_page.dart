@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../services/explore_api_service.dart';
 
 class MentorDetailPage extends StatelessWidget {
-  final String name;
-  final String imagePath;
-  final String branch;      // Menggantikan experience
-  final String phoneNumber; // Menggantikan age
-  final String about;
+  final StaffModel staff;
 
   const MentorDetailPage({
     super.key,
-    required this.name,
-    required this.imagePath,
-    required this.branch,
-    required this.phoneNumber,
-    required this.about,
+    required this.staff,
   });
 
   @override
   Widget build(BuildContext context) {
+    final photoUrl = staff.photoUrl;
+
+
     return Scaffold(
       body: Stack(
         children: [
-          // Background Gradient & Image
           Container(
             width: double.infinity,
             height: MediaQuery.of(context).size.height * 0.6,
@@ -29,12 +25,7 @@ class MentorDetailPage extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF0D47A1),
-                  Color(0xFF42A5F5),
-                  Color(0xFFB3E5FC),
-                  Colors.white,
-                ],
+                colors: [Color(0xFF0D47A1), Color(0xFF42A5F5), Color(0xFFB3E5FC), Colors.white],
                 stops: [0.0, 0.25, 0.5, 1.0],
               ),
             ),
@@ -55,11 +46,9 @@ class MentorDetailPage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          name,
+                          staff.name,
                           style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white,
                             shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 2))],
                           ),
                         ),
@@ -68,7 +57,32 @@ class MentorDetailPage extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: Image.asset(imagePath, fit: BoxFit.cover, alignment: Alignment.topCenter),
+                    child: photoUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: photoUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          alignment: Alignment.topCenter,
+                          placeholder: (_, __) => Container(
+                            color: Colors.grey[300],
+                            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                          ),
+                          errorWidget: (_, __, ___) => Container(
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: Text(staff.name[0].toUpperCase(),
+                                style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white)),
+                            ),
+                          ),
+                        )
+                      // Fallback: inisial nama
+                      : Container(
+                          color: const Color(0xFF42A5F5),
+                          child: Center(
+                            child: Text(staff.name[0].toUpperCase(),
+                              style: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold, color: Colors.white)),
+                          ),
+                        ),
                   ),
                   const SizedBox(height: 11),
                 ],
@@ -76,7 +90,6 @@ class MentorDetailPage extends StatelessWidget {
             ),
           ),
 
-          // Stats Section (Cabang & No. Telepon)
           Positioned(
             top: MediaQuery.of(context).size.height * 0.43,
             left: 20,
@@ -84,14 +97,14 @@ class MentorDetailPage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildStatCard(branch, "Cabang"),
-                const SizedBox(width: 20), // Jarak antar kartu
-                _buildStatCard(phoneNumber, "No. Telepon"),
+                _buildStatCard(staff.branchName, "Cabang"),
+                const SizedBox(width: 20),
+                _buildStatCard(staff.contact ?? "-", "No. Telepon"),
               ],
             ),
           ),
 
-          // Bottom Sheet Content (About & Chat Button)
+
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -108,8 +121,7 @@ class MentorDetailPage extends StatelessWidget {
                 children: [
                   Center(
                     child: Container(
-                      width: 40,
-                      height: 4,
+                      width: 40, height: 4,
                       decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
@@ -119,12 +131,15 @@ class MentorDetailPage extends StatelessWidget {
                   Expanded(
                     child: SingleChildScrollView(
                       child: Text(
-                        about,
+                        staff.description?.isNotEmpty == true
+                          ? staff.description!
+                          : "Belum ada deskripsi tersedia.",
                         style: TextStyle(color: Colors.grey[700], fontSize: 15, height: 1.6),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // Tombol Chat (TIDAK BERUBAH)
                   Container(
                     width: double.infinity,
                     height: 55,
@@ -139,7 +154,8 @@ class MentorDetailPage extends StatelessWidget {
                         shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                       ),
-                      child: const Text("Chat", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      child: const Text("Chat",
+                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -151,10 +167,10 @@ class MentorDetailPage extends StatelessWidget {
     );
   }
 
+
   Widget _buildStatCard(String value, String label) {
     return Container(
-      width: 140, // Diperlebar agar teks info baru muat dengan aman
-      height: 95,
+      width: 140, height: 95,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -165,20 +181,14 @@ class MentorDetailPage extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              value,
+            child: Text(value,
               textAlign: TextAlign.center,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+              maxLines: 2, overflow: TextOverflow.ellipsis),
           ),
           const SizedBox(height: 5),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.grey, fontSize: 11),
-          ),
+          Text(label, textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.grey, fontSize: 11)),
         ],
       ),
     );

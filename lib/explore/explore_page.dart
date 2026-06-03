@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'mentor_detail_page.dart';
 import 'searching_page.dart';
 import '../chat/chat_page.dart';
@@ -6,7 +7,10 @@ import '../profile/profile_page.dart';
 import '../home/notif_page.dart';
 import '../home/home_page.dart';
 import '../scan/check_in_page.dart';
-import '../scan/history_page.dart'; 
+import '../scan/history_page.dart';
+import '../services/booking_api_service.dart';
+import '../services/explore_api_service.dart';
+import '../config/app_config.dart';
 
 class ExplorePage extends StatefulWidget {
   final String userName;
@@ -18,6 +22,43 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
+  List<BookingModel> _recentHistory = [];
+  bool _isLoadingHistory = false;
+
+  List<StaffModel> _staffList = [];
+  bool _isLoadingStaff = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+    _loadStaff();
+  }
+
+  Future<void> _loadHistory() async {
+    setState(() => _isLoadingHistory = true);
+    try {
+      final history = await BookingApiService.getBookingHistory();
+      setState(() {
+        _recentHistory = history.take(3).toList();
+      });
+    } catch (_) {
+    } finally {
+      setState(() => _isLoadingHistory = false);
+    }
+  }
+
+  Future<void> _loadStaff() async {
+    setState(() => _isLoadingStaff = true);
+    try {
+      final staff = await ExploreApiService.getAllStaff();
+      setState(() => _staffList = staff);
+    } catch (_) {
+    } finally {
+      setState(() => _isLoadingStaff = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,75 +84,36 @@ class _ExplorePageState extends State<ExplorePage> {
             String assetImage = "assets/spa.JPG";
             String type = "SPA";
             String titleLower = title.toLowerCase();
-
-            if (titleLower.contains("yoga")) {
-              assetImage = "assets/yoga.JPG";
-              type = "YOGA";
-            } else if (titleLower.contains("hiit")) {
-              assetImage = "assets/hiit.JPG";
-              type = "HIIT";
-            } else if (titleLower.contains("pilates")) {
-              assetImage = "assets/pilates.JPG";
-              type = "PILATES";
-            } else if (titleLower.contains("massage")) {
-              assetImage = "assets/massage.JPG";
-              type = "MASSAGE";
-            } else if (titleLower.contains("spa")) {
-              assetImage = "assets/spa.JPG";
-              type = "SPA";
-            } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
-              assetImage = "assets/fisioterapi.JPG";
-              type = "PHYSIOTHERAPY";
-            } else if (titleLower.contains("gym")) {
-              assetImage = "assets/gymuntar.jpg";
-              type = "GYM";
-            }
+            if (titleLower.contains("yoga")) { assetImage = "assets/yoga.JPG"; type = "YOGA"; }
+            else if (titleLower.contains("hiit")) { assetImage = "assets/hiit.JPG"; type = "HIIT"; }
+            else if (titleLower.contains("pilates")) { assetImage = "assets/pilates.JPG"; type = "PILATES"; }
+            else if (titleLower.contains("massage")) { assetImage = "assets/massage.JPG"; type = "MASSAGE"; }
+            else if (titleLower.contains("spa")) { assetImage = "assets/spa.JPG"; type = "SPA"; }
+            else if (titleLower.contains("physio") || titleLower.contains("terapi")) { assetImage = "assets/fisioterapi.JPG"; type = "PHYSIOTHERAPY"; }
+            else if (titleLower.contains("gym")) { assetImage = "assets/gymuntar.jpg"; type = "GYM"; }
 
             int dayNum = 24;
             final RegExp matchDay = RegExp(r'^\d+');
-            if (matchDay.hasMatch(date)) {
-              dayNum = int.parse(matchDay.stringMatch(date)!);
-            }
-            
+            if (matchDay.hasMatch(date)) dayNum = int.parse(matchDay.stringMatch(date)!);
             String monthYear = date.replaceFirst(matchDay, '').trim();
-            if (monthYear.contains(",")) {
-              monthYear = monthYear.split(",").first.trim();
-            }
-
-            if (monthYear.isEmpty) {
-              monthYear = "May 2026";
-            } else if (!monthYear.contains("2026")) {
-              monthYear = "$monthYear 2026";
-            }
-            
+            if (monthYear.contains(",")) monthYear = monthYear.split(",").first.trim();
+            if (monthYear.isEmpty) monthYear = "May 2026";
+            else if (!monthYear.contains("2026")) monthYear = "$monthYear 2026";
             String finalBookingRange = "$dayNum $monthYear";
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CheckInPage(
-                  dateString: "$date, $time",
-                  gymName: title,
-                  location: "Jakarta",
-                  rating: 4.9,
-                  imagePath: assetImage,
-                  bookingDates: finalBookingRange,
-                  guestInfo: "2 Guests (1 Room)",
-                  roomType: type,
-                  phoneNumber: "0214345646",
-                  status: "Pending",
-                ),
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => CheckInPage(
+                dateString: "$date, $time", gymName: title, location: "Jakarta",
+                rating: 4.9, imagePath: assetImage, bookingDates: finalBookingRange,
+                guestInfo: "2 Guests (1 Room)", roomType: type,
+                phoneNumber: "0214345646", status: "Pending",
               ),
-            );
+            ));
           },
           backgroundColor: Colors.white,
           elevation: 4,
           shape: const CircleBorder(),
-          child: const Icon(
-            Icons.crop_free,
-            color: Colors.black,
-            size: 30,
-          ),
+          child: const Icon(Icons.crop_free, color: Colors.black, size: 30),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -122,12 +124,7 @@ class _ExplorePageState extends State<ExplorePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF0D47A1),
-              Color(0xFF42A5F5),
-              Color(0xFFB3E5FC),
-              Colors.white,
-            ],
+            colors: [Color(0xFF0D47A1), Color(0xFF42A5F5), Color(0xFFB3E5FC), Colors.white],
             stops: [0.0, 0.25, 0.5, 1.0],
           ),
         ),
@@ -145,8 +142,6 @@ class _ExplorePageState extends State<ExplorePage> {
                 _buildLastBooking(),
                 const SizedBox(height: 25),
                 _buildMentorSection(),
-                const SizedBox(height: 25),
-                _buildPopularGymSection(),
                 const SizedBox(height: 100),
               ],
             ),
@@ -160,21 +155,17 @@ class _ExplorePageState extends State<ExplorePage> {
     return Row(
       children: [
         const CircleAvatar(
-          radius: 22,
-          backgroundColor: Colors.white,
+          radius: 22, backgroundColor: Colors.white,
           child: Icon(Icons.person, color: Colors.black),
         ),
         const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 13)),
-            Text(
-              widget.userName.isNotEmpty ? widget.userName : "User",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
-            ),
-          ],
-        ),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 13)),
+          Text(
+            widget.userName.isNotEmpty ? widget.userName : "User",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
+          ),
+        ]),
       ],
     );
   }
@@ -185,23 +176,12 @@ class _ExplorePageState extends State<ExplorePage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          )
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 12, offset: const Offset(0, 4))],
       ),
       child: TextField(
         readOnly: true,
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SearchingPage(),
-            ),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const SearchingPage()));
         },
         decoration: const InputDecoration(
           icon: Icon(Icons.search, color: Colors.grey),
@@ -214,133 +194,110 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
   Widget _buildLastBooking() {
-    final List<Map<String, String>> validBookings = [];
-    final Set<String> uniqueKeys = {};
-
-    for (int i = NotifPage.notifications.length - 1; i >= 0; i--) {
-      final item = NotifPage.notifications[i];
-      String title = (item["title"] ?? "").toString();
-      String date = (item["date"] ?? "").toString();
-      String time = (item["time"] ?? "").toString();
-
-      String uniqueKey = "$title-$date-$time";
-
-      if (!uniqueKeys.contains(uniqueKey)) {
-        uniqueKeys.add(uniqueKey);
-        validBookings.add({
-          "title": title,
-          "date": date,
-          "time": time,
-        });
-      }
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // --- Perubahan dimulai dari sini ---
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Last Booking",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
-            ),
+            const Text("Last Booking",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
             GestureDetector(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HistoryPage()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryPage()));
               },
-              child: const Text(
-                "See all",
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Colors.white70, 
-                ),
-              ),
+              child: const Text("See all",
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14, color: Colors.white70)),
             ),
           ],
         ),
-        // --- Perubahan selesai di sini ---
         const SizedBox(height: 15),
-        validBookings.isEmpty
-            ? const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Text(
-                  "No recent booking history found.",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              )
-            : SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(validBookings.length, (index) {
-                    final booking = validBookings[index];
-                    String title = booking["title"] ?? "";
-
-                    String assetImage = "assets/gymuntar.jpg";
-                    String titleLower = title.toLowerCase();
-
-                    if (titleLower.contains("yoga")) {
-                      assetImage = "assets/yoga.JPG";
-                    } else if (titleLower.contains("hiit")) {
-                      assetImage = "assets/hiit.JPG";
-                    } else if (titleLower.contains("pilates")) {
-                      assetImage = "assets/pilates.JPG";
-                    } else if (titleLower.contains("massage")) {
-                      assetImage = "assets/massage.JPG";
-                    } else if (titleLower.contains("spa")) {
-                      assetImage = "assets/spa.JPG";
-                    } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
-                      assetImage = "assets/fisioterapi.JPG";
-                    }
-
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        right: index == validBookings.length - 1 ? 0.0 : 15.0,
-                      ),
-                      child: _buildBookingCard(title, assetImage),
-                    );
-                  }),
-                ),
-              ),
+        if (_isLoadingHistory)
+          const SizedBox(
+            height: 100,
+            child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+          )
+        else if (_recentHistory.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              "No recent booking history found.",
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+          )
+        else
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: _recentHistory.asMap().entries.map((entry) {
+                final i = entry.key;
+                final booking = entry.value;
+                return Padding(
+                  padding: EdgeInsets.only(right: i == _recentHistory.length - 1 ? 0.0 : 15.0),
+                  child: _buildBookingCardFromApi(booking),
+                );
+              }).toList(),
+            ),
+          ),
       ],
     );
   }
 
-  Widget _buildBookingCard(String name, String imagePath) {
+  Widget _buildBookingCardFromApi(BookingModel booking) {
+    final sch = booking.schedule;
+    final serviceName = sch['service_name_name'] as String? ?? '';
+    final branchName  = booking.branch['name'] as String? ?? '';
+    final branchPhoto = booking.branch['photo'] as String?;
+
+    Widget imageWidget;
+    if (branchPhoto != null && branchPhoto.isNotEmpty) {
+      imageWidget = CachedNetworkImage(
+        imageUrl: '${AppConfig.uploadsBaseUrl}/branches/$branchPhoto',
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorWidget: (_, __, ___) => Container(color: Colors.grey[400]),
+      );
+    } else {
+      imageWidget = Container(color: const Color(0xFF42A5F5));
+    }
+
     return Container(
       width: 160,
       height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.25), blurRadius: 10, offset: const Offset(0, 4))
-        ],
-        image: DecorationImage(
-          image: AssetImage(imagePath),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.35), BlendMode.darken),
-        ),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 10, offset: const Offset(0, 4))],
+        color: Colors.grey[300],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Align(
-          alignment: Alignment.bottomLeft,
-          child: Text(
-            name,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ColorFiltered(
+              colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.4), BlendMode.darken),
+              child: imageWidget,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(serviceName,
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(branchName,
+                      style: const TextStyle(color: Colors.white70, fontSize: 10),
+                      maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -350,87 +307,40 @@ class _ExplorePageState extends State<ExplorePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Find Your Best Mentor", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        const Text("Find Your Best Mentor",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         const SizedBox(height: 15),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              children: [
-                _buildMentorAvatar("Crystal", "assets/coachcewe.JPG"),
-                _buildMentorAvatar("Garry", "assets/coachcowo.JPG"),
-                _buildMentorAvatar("Jessica", "assets/coachcewe.JPG"),
-                _buildMentorAvatar("Karl", "assets/coachcowo.JPG"),
-                _buildMentorAvatar("Sofia", "assets/coachcewe.JPG"),
-                _buildMentorAvatar("Woody", "assets/coachcowo.JPG"),
-              ],
+        if (_isLoadingStaff)
+          const SizedBox(
+            height: 80,
+            child: Center(child: CircularProgressIndicator(color: Color(0xFF4285F4), strokeWidth: 2)),
+          )
+        else if (_staffList.isEmpty)
+          const Text("Belum ada staff tersedia", style: TextStyle(color: Colors.grey, fontSize: 13))
+        else
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: _staffList.map((staff) => _buildStaffAvatar(staff)).toList(),
+              ),
             ),
           ),
-        ),
       ],
     );
   }
 
-  Widget _buildMentorAvatar(String name, String imagePath) {
-    String detailImage = imagePath.toLowerCase().contains("cewe")
-        ? "assets/mentorcewe.png"
-        : "assets/mentorcowo.png";
-
-    String exp = "5 Years";
-    String age = "25";
-    String work = "Fit Studio";
-    String about = "Certified instructor dedicated to helping you reach your fitness goals.";
-
-    if (name == "Garry") {
-      exp = "8 Years";
-      age = "30";
-      work = "CoreFit Gym";
-      about =
-          "Expert in high-intensity muscle building and strength conditioning at CoreFit. Garry focuses on proper form and powerlifting techniques.";
-    } else if (name == "Jessica") {
-      exp = "6 Years";
-      age = "28";
-      work = "MoveFit Pilates";
-      about =
-          "Specializes in clinical pilates and core stability. Jessica helps clients improve flexibility and posture through mindful movement.";
-    } else if (name == "Sofia") {
-      exp = "10 Years";
-      age = "32";
-      work = "FlexFit Yoga";
-      about =
-          "A master of Vinyasa and Hatha Yoga. Sofia integrates mental wellness with physical strength, guiding students through a holistic journey.";
-    } else if (name == "Crystal") {
-      exp = "4 Years";
-      age = "24";
-      work = "Elite Fitness";
-      about =
-          "Passionate about cardio and fat-loss programs. Crystal's energetic approach makes every workout session feel like a new challenge.";
-    } else if (name == "Karl") {
-      exp = "12 Years";
-      age = "35";
-      work = "Iron Paradise";
-      about =
-          "Former professional athlete. Karl brings a competitive edge to training, specializing in endurance and performance.";
-    } else if (name == "Woody") {
-      exp = "7 Years";
-      age = "29";
-      work = "Body Mechanics";
-      about =
-          "Focuses on functional training and injury recovery. Woody ensures your body moves correctly so you can stay active for life.";
-    }
+  Widget _buildStaffAvatar(StaffModel staff) {
+    final photoUrl = staff.photoUrl;
 
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => MentorDetailPage(
-              name: name,
-      imagePath: detailImage,
-      branch: "Jakarta Pusat", 
-      phoneNumber: "081221987317", 
-      about: about,
+            builder: (_) => MentorDetailPage(
+              staff: staff,
             ),
           ),
         );
@@ -442,99 +352,29 @@ class _ExplorePageState extends State<ExplorePage> {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 8, offset: const Offset(0, 4))],
               ),
-              child: CircleAvatar(radius: 30, backgroundColor: Colors.white, backgroundImage: AssetImage(imagePath)),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: photoUrl != null
+                  ? CachedNetworkImageProvider(photoUrl) as ImageProvider
+                  : null,
+                child: photoUrl == null
+                  ? Text(staff.name[0].toUpperCase(),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.grey))
+                  : null,
+              ),
             ),
             const SizedBox(height: 8),
-            Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPopularGymSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Most Popular At GYM", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        const SizedBox(height: 15),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildPopularCard("GYM", "CoreFit Gym", "Jakarta Selatan", "assets/gymuntar.jpg", "6:00 PM", "60", "Garry"),
-              _buildPopularCard("PILATES", "MoveFit Pilates", "Jakarta Barat", "assets/pilates.JPG", "7:00 PM", "45", "Jessica"),
-              _buildPopularCard("Physiotherapy", "ActiveFit Physiotherapy", "Jakarta Utara", "assets/fisioterapi.JPG", "2:00 PM", "30", "Karl"),
-              _buildPopularCard("YOGA", "FlexFit Yoga", "Jakarta Pusat", "assets/yoga.JPG", "7:00 PM", "50", "Sofia"),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPopularCard(String category, String name, String loc, String imagePath, String time,
-      String duration, String coach) {
-    return Container(
-      width: 220,
-      height: 320,
-      margin: const EdgeInsets.only(right: 15, bottom: 15),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(25),
-        child: Stack(
-          children: [
-            Image.asset(imagePath, height: double.infinity, width: double.infinity, fit: BoxFit.cover),
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withValues(alpha: 0.9)],
-                    stops: const [0.5, 1.0],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 20,
-              left: 20,
-              right: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(category,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22)),
-                  const SizedBox(height: 5),
-                  Text("$name, $loc", style: const TextStyle(color: Colors.white70, fontSize: 13)),
-                  const SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("$time | $duration\nMins",
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                      Text(coach, style: const TextStyle(color: Colors.white, fontSize: 14)),
-                    ],
-                  ),
-                ],
+            SizedBox(
+              width: 60,
+              child: Text(
+                staff.name.split(' ').first,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -553,21 +393,15 @@ class _ExplorePageState extends State<ExplorePage> {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _navItem(context, Icons.home_filled, "Home", false, 0),
-              _navItem(context, Icons.search, "Explore", true, 1),
-            ],
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _navItem(context, Icons.chat_bubble_outline, "Chat", false, 2),
-              _navItem(context, Icons.person_outline, "Profile", false, 3),
-            ],
-          ),
+        children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _navItem(context, Icons.home_filled, "Home", false, 0),
+            _navItem(context, Icons.search, "Explore", true, 1),
+          ]),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _navItem(context, Icons.chat_bubble_outline, "Chat", false, 2),
+            _navItem(context, Icons.person_outline, "Profile", false, 3),
+          ]),
         ],
       ),
     );
@@ -578,28 +412,15 @@ class _ExplorePageState extends State<ExplorePage> {
       minWidth: 40,
       onPressed: () {
         if (isActive) return;
-        if (index == 0) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(userName: widget.userName)));
-        } else if (index == 2) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
-        } else if (index == 3) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
-        }
+        if (index == 0) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage(userName: widget.userName)));
+        else if (index == 2) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ChatPage(userName: widget.userName)));
+        else if (index == 3) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ProfilePage(userName: widget.userName)));
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: isActive ? const Color(0xFF4285F4) : Colors.grey),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: isActive ? const Color(0xFF4285F4) : Colors.grey,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Icon(icon, color: isActive ? const Color(0xFF4285F4) : Colors.grey),
+        Text(label, style: TextStyle(fontSize: 12, color: isActive ? const Color(0xFF4285F4) : Colors.grey,
+          fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+      ]),
     );
   }
 }
