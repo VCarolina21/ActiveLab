@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'package:activelab/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
-///import '../sign_in/sign_page.dart';
+import '../profile/profile_page.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -81,7 +80,6 @@ class _LoginPageState extends State<LoginPage> {
               return Image.asset(_pageData[index]["image"]!, fit: BoxFit.cover);
             },
           ),
-
           Align(
             alignment: Alignment.bottomCenter,
             child: FractionallySizedBox(
@@ -110,7 +108,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.fromLTRB(30, 40, 30, 20),
                     child: Column(
@@ -136,7 +133,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const Spacer(),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(_pageData.length, (index) {
@@ -155,20 +151,18 @@ class _LoginPageState extends State<LoginPage> {
                           }),
                         ),
                         const SizedBox(height: 30),
-
                         SizedBox(
                           width: double.infinity,
                           height: 55,
                           child: ElevatedButton(
                             onPressed: () {
-                              // Menggunakan pushReplacement agar pengguna tidak bisa
-                              // menekan tombol 'back' perangkat untuk kembali ke halaman login.
+                              // Diarahkan langsung ke ProfilePage
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const HomePage(
+                                  builder: (context) => const ProfilePage(
                                     userName: "Guest",
-                                  ), // Kirim nama default
+                                  ),
                                 ),
                               );
                             },

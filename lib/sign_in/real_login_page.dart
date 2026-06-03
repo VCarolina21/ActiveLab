@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../interest/interest_page.dart';
+import '../profile/profile_page.dart';
 import '../config/services/user_api_services.dart';
 import '../config/services/user_session.dart';
 
@@ -18,56 +18,56 @@ class _RealLoginPageState extends State<RealLoginPage> {
   bool _passwordError = false;
   bool _isLoading = false;
 
+  void _handleLogin() async {
+    setState(() {
+      _emailError = _emailController.text.isEmpty;
+      _passwordError = _passwordController.text.isEmpty;
+    });
 
-void _handleLogin() async {
-  setState(() {
-    _emailError    = _emailController.text.isEmpty;
-    _passwordError = _passwordController.text.isEmpty;
-  });
+    if (_emailError || _passwordError) return;
 
-  if (_emailError || _passwordError) return;
+    setState(() => _isLoading = true);
 
-  setState(() => _isLoading = true);
+    try {
+      final response = await UserApiService.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
 
-  try {
-    final response = await UserApiService.login(
-      email:    _emailController.text.trim(),
-      password: _passwordController.text,
-    );
+      final userData = response['data']['user'] as Map<String, dynamic>;
+      final token = response['data']['token'] as String;
 
-    final userData = response['data']['user'] as Map<String, dynamic>;
-    final token    = response['data']['token'] as String;
+      await UserSession.saveSession(
+        token: token,
+        id: userData['id'] as int,
+        name: userData['name'] as String,
+        email: userData['email'] as String,
+        phone: userData['phone'] as String? ?? '',
+        gender: userData['gender'] as String? ?? '',
+        photo: userData['photo'] as String? ?? '',
+      );
 
-    // Simpan session
-    await UserSession.saveSession(
-      token:  token,
-      id:     userData['id'] as int,
-      name:   userData['name'] as String,
-      email:  userData['email'] as String,
-      phone:  userData['phone'] as String? ?? '',
-      gender: userData['gender'] as String? ?? '',
-      photo:  userData['photo'] as String? ?? '',
-    );
+      if (!mounted) return;
+      
+      setState(() => _isLoading = false);
 
-    if (!mounted) return;
-    // Navigasi ke InterestPage dengan nama asli dari API
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => InterestPage(userName: userData['name'] as String),
-      ),
-    );
-  } catch (e) {
-    setState(() => _isLoading = false);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(e.toString().replaceFirst('Exception: ', '')),
-        backgroundColor: Colors.red,
-      ),
-    );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfilePage(userName: userData['name'] as String),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-}
 
   @override
   void dispose() {
@@ -127,9 +127,7 @@ void _handleLogin() async {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    
                     const Spacer(),
-
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(30, 40, 30, 60),
@@ -180,7 +178,7 @@ void _handleLogin() async {
                                 ],
                               ),
                               child: ElevatedButton(
-                                onPressed: _handleLogin,
+                                onPressed: _isLoading ? null : _handleLogin,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   shadowColor: Colors.transparent,
@@ -188,14 +186,23 @@ void _handleLogin() async {
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                 ),
-                                child: const Text(
-                                  "Next",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2.5,
+                                        ),
+                                      )
+                                    : const Text(
+                                        "Next",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                               ),
                             ),
                           ),
