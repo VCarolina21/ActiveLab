@@ -57,7 +57,7 @@ class ChatService {
         Uri.parse('$baseUrl/send'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'sender_id': currentUserId, // Menggunakan ID User asli
+          'sender_id': currentUserId,
           'receiver_id': staffId,
           'message': message,
           'is_admin': false,
