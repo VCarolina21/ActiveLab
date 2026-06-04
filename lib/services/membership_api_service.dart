@@ -6,7 +6,7 @@ import '../config/app_config.dart';
 
 class UserMembershipModel {
   final int id;
-  final String status;         // active / frozen
+  final String status;
   final String expireDate;
   final String? freezeStart;
   final int daysRemaining;

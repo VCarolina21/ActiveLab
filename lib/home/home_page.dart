@@ -12,7 +12,6 @@ import '../services/branch_api_service.dart';
 import '../config/app_config.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-
 class HomePage extends StatefulWidget {
   final String userName;
   const HomePage({super.key, required this.userName});
@@ -39,7 +38,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> _fetchBranches() async {
     setState(() => _isLoadingBranches = true);
     try {
-      final res = await BranchApiService.getBranches(page: currentPage, limit: itemsPerPage);
+      final res = await BranchApiService.getBranches(
+        page: currentPage,
+        limit: itemsPerPage,
+      );
       final paginationData = res['data']['pagination'] as Map<String, dynamic>;
       setState(() {
         _branches = (res['data']['branches'] as List)
@@ -93,7 +95,8 @@ class _HomePageState extends State<HomePage> {
             } else if (titleLower.contains("spa")) {
               assetImage = "assets/spa.JPG";
               type = "SPA";
-            } else if (titleLower.contains("physio") || titleLower.contains("terapi")) {
+            } else if (titleLower.contains("physio") ||
+                titleLower.contains("terapi")) {
               assetImage = "assets/fisioterapi.JPG";
               type = "PHYSIOTHERAPY";
             } else if (titleLower.contains("gym")) {
@@ -106,7 +109,7 @@ class _HomePageState extends State<HomePage> {
             if (matchDay.hasMatch(date)) {
               dayNum = int.parse(matchDay.stringMatch(date)!);
             }
-            
+
             String monthYear = date.replaceFirst(matchDay, '').trim();
             if (monthYear.contains(",")) {
               monthYear = monthYear.split(",").first.trim();
@@ -117,7 +120,7 @@ class _HomePageState extends State<HomePage> {
             } else if (!monthYear.contains("2026")) {
               monthYear = "$monthYear 2026";
             }
-            
+
             String finalBookingRange = "$dayNum $monthYear";
 
             Navigator.push(
@@ -141,11 +144,7 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.white,
           elevation: 4,
           shape: const CircleBorder(),
-          child: const Icon(
-            Icons.crop_free,
-            color: Colors.black,
-            size: 30,
-          ),
+          child: const Icon(Icons.crop_free, color: Colors.black, size: 30),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -178,9 +177,12 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 25),
                 _buildWeeklyTarget(),
                 const SizedBox(height: 25),
-                const Text("Explore ActiveLab", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                const Text(
+                  "Explore ActiveLab",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
                 const SizedBox(height: 15),
-                
+
                 // ── LOADING / DAFTAR BRANCH DARI API ──
                 if (_isLoadingBranches)
                   const Padding(
@@ -205,22 +207,35 @@ class _HomePageState extends State<HomePage> {
                       IconButton(
                         icon: const Icon(Icons.arrow_back_ios, size: 18),
                         onPressed: currentPage > 1
-                            ? () { setState(() { currentPage--; }); _fetchBranches(); }
+                            ? () {
+                                setState(() {
+                                  currentPage--;
+                                });
+                                _fetchBranches();
+                              }
                             : null,
                       ),
                       Text(
                         "Page $currentPage of $_totalPages",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.arrow_forward_ios, size: 18),
                         onPressed: currentPage < _totalPages
-                            ? () { setState(() { currentPage++; }); _fetchBranches(); }
+                            ? () {
+                                setState(() {
+                                  currentPage++;
+                                });
+                                _fetchBranches();
+                              }
                             : null,
                       ),
                     ],
                   ),
-                const SizedBox(height: 100), 
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -234,21 +249,20 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => DetailPage(
-      branchId: branch.id,
-      title: branch.name,
-      location: branch.address,
-      rating: 0.0,
-      // Gunakan branch.photoUrl. Berikan fallback string kosong jika null.
-      imagePath: branch.photoUrl ?? '', 
-      quota: '',
-      mentorName: 'Staff',
-      mentorRole: '${branch.name} Mentor',
-    ),
-  ),
-);
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(
+              branchId: branch.id,
+              title: branch.name,
+              location: branch.address,
+              rating: 0.0,
+              imagePath: branch.photoUrl ?? '',
+              quota: '',
+              mentorName: 'Staff',
+              mentorRole: '${branch.name} Mentor',
+            ),
+          ),
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -260,7 +274,7 @@ class _HomePageState extends State<HomePage> {
               color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 15,
               offset: const Offset(0, 6),
-            )
+            ),
           ],
         ),
         child: Row(
@@ -271,19 +285,26 @@ class _HomePageState extends State<HomePage> {
                 width: 80,
                 height: 80,
                 child: branch.photoUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: branch.photoUrl!,
-                      fit: BoxFit.cover,
-                      placeholder: (c, u) => Container(color: Colors.grey[200]),
-                      errorWidget: (c, u, e) => Container(
+                    ? CachedNetworkImage(
+                        imageUrl: branch.photoUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (c, u) =>
+                            Container(color: Colors.grey[200]),
+                        errorWidget: (c, u, e) => Container(
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.fitness_center,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )
+                    : Container(
                         color: Colors.grey[200],
-                        child: const Icon(Icons.fitness_center, color: Colors.grey),
+                        child: const Icon(
+                          Icons.fitness_center,
+                          color: Colors.grey,
+                        ),
                       ),
-                    )
-                  : Container(
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.fitness_center, color: Colors.grey),
-                    ),
               ),
             ),
             const SizedBox(width: 15),
@@ -291,16 +312,29 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(branch.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(
+                    branch.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 14, color: Colors.grey),
+                      const Icon(
+                        Icons.location_on,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           branch.address,
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -318,19 +352,51 @@ class _HomePageState extends State<HomePage> {
   Widget _buildHeader(BuildContext context) {
     return Row(
       children: [
-        const CircleAvatar(radius: 25, backgroundColor: Colors.white, child: Icon(Icons.person, color: Colors.black)),
+        const CircleAvatar(
+          radius: 25,
+          backgroundColor: Colors.white,
+          child: Icon(Icons.person, color: Colors.black),
+        ),
         const SizedBox(width: 12),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text("Hello !", style: TextStyle(color: Colors.white70, fontSize: 14)),
-          Text(widget.userName.isNotEmpty ? widget.userName : "User", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-        ]),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Hello !",
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+            Text(
+              widget.userName.isNotEmpty ? widget.userName : "User",
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
         const Spacer(),
         GestureDetector(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotifPage())),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NotifPage()),
+          ),
           child: Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4)]),
-            child: const Icon(Icons.notifications_none_outlined, color: Colors.blue),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.notifications_none_outlined,
+              color: Colors.blue,
+            ),
           ),
         ),
       ],
@@ -340,41 +406,111 @@ class _HomePageState extends State<HomePage> {
   Widget _buildChallengeCard() {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 25, offset: const Offset(0, 12))]),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 25,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
         child: Container(
-          decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF64B5F6), Color(0xFF1976D2)])),
-          child: Stack(children: [
-            Positioned(right: -210, bottom: -45, child: Image.asset('assets/duduk.png', width: 700, fit: BoxFit.contain)),
-            Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text("30 Days", style: TextStyle(color: Colors.white70)),
-              const Text("WHOLE BODY\nCHALLENGE", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
-              const SizedBox(height: 15),
-              const Text("40% complete", style: TextStyle(color: Colors.white, fontSize: 12)),
-              const SizedBox(height: 5),
-              _progressBar(),
-              const Text("DAY 3", style: TextStyle(color: Colors.white, fontSize: 60, fontWeight: FontWeight.w900)),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const StartPage()),
-                  );
-                }, 
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF1976D2)), 
-                child: const Text("START")
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF64B5F6), Color(0xFF1976D2)],
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -210,
+                bottom: -45,
+                child: Image.asset(
+                  'assets/duduk.png',
+                  width: 700,
+                  fit: BoxFit.contain,
+                ),
               ),
-            ])),
-          ]),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "30 Days",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    const Text(
+                      "WHOLE BODY\nCHALLENGE",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    const Text(
+                      "40% complete",
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                    const SizedBox(height: 5),
+                    _progressBar(),
+                    const Text(
+                      "DAY 3",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 60,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const StartPage(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1976D2),
+                      ),
+                      child: const Text("START"),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _progressBar() {
-    return Container(width: 120, height: 8, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(5)),
-      child: FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: 0.4, child: Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(5)))));
+    return Container(
+      width: 120,
+      height: 8,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: FractionallySizedBox(
+        alignment: Alignment.centerLeft,
+        widthFactor: 0.4,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildWeeklyTarget() {
@@ -387,20 +523,33 @@ class _HomePageState extends State<HomePage> {
       },
       child: Container(
         padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))]),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("WEEKLY TARGET", style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 15), 
+            const Text(
+              "WEEKLY TARGET",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 15),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(7, (i) {
                 int dayNumber = i + 1;
                 return _dayCircle(dayNumber <= 3, dayNumber, dayNumber == 3);
               }),
             ),
-          ]
+          ],
         ),
       ),
     );
@@ -412,16 +561,35 @@ class _HomePageState extends State<HomePage> {
       clipBehavior: Clip.none,
       children: [
         Container(
-          width: 35, height: 35, 
+          width: 35,
+          height: 35,
           decoration: BoxDecoration(
-            shape: BoxShape.circle, 
-            color: isReached ? const Color(0xFFE3F2FD) : Colors.transparent, 
-            border: Border.all(color: isReached ? const Color(0xFF4285F4) : Colors.grey[300]!)
+            shape: BoxShape.circle,
+            color: isReached ? const Color(0xFFE3F2FD) : Colors.transparent,
+            border: Border.all(
+              color: isReached ? const Color(0xFF4285F4) : Colors.grey[300]!,
+            ),
           ),
-          child: Center(child: Text("$day", style: TextStyle(color: isReached ? const Color(0xFF4285F4) : Colors.grey, fontWeight: isReached ? FontWeight.bold : FontWeight.normal))),
+          child: Center(
+            child: Text(
+              "$day",
+              style: TextStyle(
+                color: isReached ? const Color(0xFF4285F4) : Colors.grey,
+                fontWeight: isReached ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
         ),
         if (showFire)
-          const Positioned(top: -12, right: -5, child: Icon(Icons.local_fire_department_rounded, color: Color(0xFF4285F4), size: 20)),
+          const Positioned(
+            top: -12,
+            right: -5,
+            child: Icon(
+              Icons.local_fire_department_rounded,
+              color: Color(0xFF4285F4),
+              size: 20,
+            ),
+          ),
       ],
     );
   }
@@ -456,17 +624,36 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _navItem(BuildContext context, IconData icon, String label, bool isActive, int index) {
+  Widget _navItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    bool isActive,
+    int index,
+  ) {
     return MaterialButton(
       minWidth: 40,
       onPressed: () {
         if (isActive) return;
         if (index == 1) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ExplorePage(userName: widget.userName)));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExplorePage(userName: widget.userName),
+            ),
+          );
         } else if (index == 2) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatPage(userName: widget.userName)));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatPage()),
+          );
         } else if (index == 3) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ProfilePage(userName: widget.userName)));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfilePage(userName: widget.userName),
+            ),
+          );
         }
       },
       child: Column(
