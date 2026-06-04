@@ -5,15 +5,11 @@ import '../services/explore_api_service.dart';
 class MentorDetailPage extends StatelessWidget {
   final StaffModel staff;
 
-  const MentorDetailPage({
-    super.key,
-    required this.staff,
-  });
+  const MentorDetailPage({super.key, required this.staff});
 
   @override
   Widget build(BuildContext context) {
     final photoUrl = staff.photoUrl;
-
 
     return Scaffold(
       body: Stack(
@@ -25,7 +21,12 @@ class MentorDetailPage extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF0D47A1), Color(0xFF42A5F5), Color(0xFFB3E5FC), Colors.white],
+                colors: [
+                  Color(0xFF0D47A1),
+                  Color(0xFF42A5F5),
+                  Color(0xFFB3E5FC),
+                  Colors.white,
+                ],
                 stops: [0.0, 0.25, 0.5, 1.0],
               ),
             ),
@@ -33,23 +34,41 @@ class MentorDetailPage extends StatelessWidget {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
                           onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back, color: Colors.black),
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                          ),
                           style: IconButton.styleFrom(
-                            backgroundColor: Colors.white.withValues(alpha: 0.9),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.9,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
                         Text(
                           staff.name,
                           style: const TextStyle(
-                            fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white,
-                            shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 2))],
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black26,
+                                blurRadius: 10,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 48),
@@ -58,31 +77,47 @@ class MentorDetailPage extends StatelessWidget {
                   ),
                   Expanded(
                     child: photoUrl != null
-                      ? CachedNetworkImage(
-                          imageUrl: photoUrl,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          alignment: Alignment.topCenter,
-                          placeholder: (_, __) => Container(
-                            color: Colors.grey[300],
-                            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                          ),
-                          errorWidget: (_, __, ___) => Container(
-                            color: Colors.grey[300],
+                        ? CachedNetworkImage(
+                            imageUrl: photoUrl,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            alignment: Alignment.topCenter,
+                            placeholder: (_, __) => Container(
+                              color: Colors.grey[300],
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                            errorWidget: (_, __, ___) => Container(
+                              color: Colors.grey[300],
+                              child: Center(
+                                child: Text(
+                                  staff.name[0].toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 60,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        // Fallback: inisial nama
+                        : Container(
+                            color: const Color(0xFF42A5F5),
                             child: Center(
-                              child: Text(staff.name[0].toUpperCase(),
-                                style: const TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white)),
+                              child: Text(
+                                staff.name[0].toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 80,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
-                        )
-                      // Fallback: inisial nama
-                      : Container(
-                          color: const Color(0xFF42A5F5),
-                          child: Center(
-                            child: Text(staff.name[0].toUpperCase(),
-                              style: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold, color: Colors.white)),
-                          ),
-                        ),
                   ),
                   const SizedBox(height: 11),
                 ],
@@ -104,7 +139,6 @@ class MentorDetailPage extends StatelessWidget {
             ),
           ),
 
-
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -114,27 +148,44 @@ class MentorDetailPage extends StatelessWidget {
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 20, offset: Offset(0, -5))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 20,
+                    offset: Offset(0, -5),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
                     child: Container(
-                      width: 40, height: 4,
-                      decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10)),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 25),
-                  const Text("About", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "About",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 12),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Text(
                         staff.description?.isNotEmpty == true
-                          ? staff.description!
-                          : "Belum ada deskripsi tersedia.",
-                        style: TextStyle(color: Colors.grey[700], fontSize: 15, height: 1.6),
+                            ? staff.description!
+                            : "Belum ada deskripsi tersedia.",
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 15,
+                          height: 1.6,
+                        ),
                       ),
                     ),
                   ),
@@ -145,17 +196,27 @@ class MentorDetailPage extends StatelessWidget {
                     height: 55,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
-                      gradient: const LinearGradient(colors: [Color(0xFF81D4FA), Color(0xFF42A5F5)]),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF81D4FA), Color(0xFF42A5F5)],
+                      ),
                     ),
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
-                      child: const Text("Chat",
-                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        "Chat",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -167,28 +228,40 @@ class MentorDetailPage extends StatelessWidget {
     );
   }
 
-
   Widget _buildStatCard(String value, String label) {
     return Container(
-      width: 140, height: 95,
+      width: 140,
+      height: 95,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 15, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 15,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(value,
+            child: Text(
+              value,
               textAlign: TextAlign.center,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              maxLines: 2, overflow: TextOverflow.ellipsis),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           const SizedBox(height: 5),
-          Text(label, textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.grey, fontSize: 11)),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.grey, fontSize: 11),
+          ),
         ],
       ),
     );

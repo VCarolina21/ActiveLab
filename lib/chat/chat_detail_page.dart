@@ -1,95 +1,210 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'chat_service.dart';
 
-class ChatDetailPage extends StatelessWidget {
-  final String name, image, locationName, locationType, locationImg;
-  final List<dynamic> history;
+class ChatDetailPage extends StatefulWidget {
+  final int userId;
+  final String userName;
 
-  const ChatDetailPage({
-    super.key, required this.name, required this.image, required this.history,
-    required this.locationName, required this.locationType, required this.locationImg,
-  });
+  const ChatDetailPage({Key? key, required this.userId, required this.userName})
+    : super(key: key);
+
+  @override
+  _ChatDetailPageState createState() => _ChatDetailPageState();
+}
+
+class _ChatDetailPageState extends State<ChatDetailPage> {
+  final ChatService _chatService = ChatService();
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  List<dynamic> _messages = [];
+  Timer? _pollingTimer;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _loadMessages();
+    });
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMessages() async {
+    final activeMessages = await _chatService.fetchMessages(widget.userId);
+    if (mounted) {
+      setState(() {
+        _messages = activeMessages;
+        _isLoading = false;
+      });
+      if (_messages.isNotEmpty) {
+        _scrollToBottom();
+      }
+    }
+  }
+
+  Future<void> _handleSendMessage() async {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    _messageController.clear();
+    final success = await _chatService.sendMessage(widget.userId, text);
+    if (success) {
+      _loadMessages();
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Gagal mengirim pesan')));
+      }
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white, elevation: 1,
-        leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black), onPressed: () => Navigator.pop(context)),
-        title: Row(children: [
-          CircleAvatar(backgroundImage: AssetImage(image)),
-          const SizedBox(width: 10),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(name, style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold)),
-            const Text("Online", style: TextStyle(color: Colors.blue, fontSize: 11)),
-          ]),
-        ]),
+        elevation: 1,
+        backgroundColor: const Color(0xFF4285F4),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Row(
+          children: [
+            const CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: 18,
+              child: Icon(Icons.person, color: Color(0xFF4285F4)),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.userName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  'Online',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: history.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) return Column(children: [_buildProductCard(), const SizedBox(height: 25)]);
-                final chat = history[index - 1];
-                return _buildChatBubble(chat['text'], chat['isMe'], chat['time']);
-              },
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _messages.isEmpty
+                ? Center(
+                    child: Text('Belum ada obrolan dengan ${widget.userName}.'),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = _messages[index];
+                      final bool isAdmin = msg['isAdmin'] ?? false;
+
+                      return Align(
+                        alignment: isAdmin
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isAdmin
+                                ? Colors.grey.shade200
+                                : const Color(0xFF4285F4),
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(16),
+                              topRight: const Radius.circular(16),
+                              bottomLeft: isAdmin
+                                  ? Radius.zero
+                                  : const Radius.circular(16),
+                              bottomRight: isAdmin
+                                  ? const Radius.circular(16)
+                                  : Radius.zero,
+                            ),
+                          ),
+                          child: Text(
+                            msg['text'] ?? '',
+                            style: TextStyle(
+                              color: isAdmin ? Colors.black87 : Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(
+                      hintText: 'Tulis pesan...',
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 14,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                CircleAvatar(
+                  backgroundColor: const Color(0xFF4285F4),
+                  radius: 24,
+                  child: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                    onPressed: _handleSendMessage,
+                  ),
+                ),
+              ],
             ),
           ),
-          _buildChatInput(),
         ],
       ),
-    );
-  }
-
-  Widget _buildProductCard() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))]),
-      child: Row(children: [
-        ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.asset(locationImg, width: 70, height: 70, fit: BoxFit.cover)),
-        const SizedBox(width: 15),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(locationName, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(locationType, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-          const Text("Rp 25.000 /Hour", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
-        ])),
-        const Icon(Icons.star, color: Colors.amber, size: 18),
-        const Text(" 5", style: TextStyle(fontWeight: FontWeight.bold)),
-      ]),
-    );
-  }
-
-  Widget _buildChatBubble(String msg, bool isMe, String time) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Column(
-        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: isMe ? const Color(0xFF0066FF) : Colors.white,
-              borderRadius: BorderRadius.only(topLeft: const Radius.circular(20), topRight: const Radius.circular(20), bottomLeft: Radius.circular(isMe ? 20 : 0), bottomRight: Radius.circular(isMe ? 0 : 20)),
-            ),
-            child: Text(msg, style: TextStyle(color: isMe ? Colors.white : Colors.black)),
-          ),
-          Text(time, style: const TextStyle(fontSize: 10, color: Colors.grey)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChatInput() {
-    return Container(
-      padding: const EdgeInsets.all(20), color: Colors.white,
-      child: Row(children: [
-        Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 15), decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(30)), child: const TextField(decoration: InputDecoration(hintText: "Write ...", border: InputBorder.none)))),
-        const SizedBox(width: 10),
-        const CircleAvatar(backgroundColor: Color(0xFF0066FF), child: Icon(Icons.send, color: Colors.white, size: 20)),
-      ]),
     );
   }
 }

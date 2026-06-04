@@ -98,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () async {
-                          await UserSession.clearSession(); // ← tambahkan ini
+                          await UserSession.clearSession();
                           if (!context.mounted) return;
                           Navigator.pushAndRemoveUntil(
                             context,
@@ -156,7 +156,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // DIALOG BARU UNTUK HAPUS AKUN
   void _showDeleteAccountDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -200,11 +199,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: OutlinedButton(
                         onPressed: () async {
                           try {
-                            await UserApiService.deleteAccount(); // ← panggil API
-                          } catch (_) {
-                            // Tetap lanjut hapus session meski API gagal
-                          }
-                          await UserSession.clearSession(); // ← bersihkan session
+                            await UserApiService.deleteAccount();
+                          } catch (_) {}
+                          await UserSession.clearSession();
                           if (!context.mounted) return;
                           Navigator.pushAndRemoveUntil(
                             context,
@@ -422,8 +419,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Mengecek apakah user adalah guest
-
     return Scaffold(
       extendBody: true,
       bottomNavigationBar: _buildBottomNav(context),
@@ -575,7 +570,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(height: 5),
 
                             const SizedBox(height: 15),
-                            // Pengecekan kondisi tombol Edit Profile atau login
                             _isGuest
                                 ? GestureDetector(
                                     onTap: () {
@@ -617,7 +611,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   )
                                 : GestureDetector(
-                                    // PERUBAHAN BUTTON EDIT PROFILE
                                     onTap: () async {
                                       await Navigator.push(
                                         context,
@@ -626,7 +619,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                               const EditProfilePage(),
                                         ),
                                       );
-                                      // Reload data jika ada perubahan di edit profile
                                       _loadUserData();
                                     },
                                     child: Container(
@@ -738,10 +730,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ), // Jarak antara tombol Logout dan Hapus Akun
-                      // TAMBAHAN TOMBOL HAPUS AKUN DI SINI
+                      const SizedBox(height: 15),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
                         child: SizedBox(
@@ -844,9 +833,7 @@ class _ProfilePageState extends State<ProfilePage> {
         } else if (index == 2) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => ChatPage(userName: _displayName),
-            ),
+            MaterialPageRoute(builder: (context) => const ChatPage()),
           );
         }
       },
