@@ -16,7 +16,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   
-
   String? _selectedGender;
   
   bool _showGenderError = false;
@@ -25,69 +24,62 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _showPasswordError = false;
   bool _showPhoneError = false;
   bool _isLoading = false;
-  
-  
 
+  void _validateAndContinue() async {
+    setState(() {
+      _showNameError     = _nameController.text.isEmpty;
+      _showEmailError    = _emailController.text.isEmpty;
+      _showPasswordError = _passwordController.text.isEmpty;
+      _showPhoneError    = _phoneController.text.isEmpty;
+      _showGenderError   = _selectedGender == null;
+    });
 
+    if (_showNameError || _showEmailError || _showPasswordError ||
+        _showPhoneError || _showGenderError) return;
 
-// ── GANTI _validateAndContinue MENJADI ────────────────────────
-void _validateAndContinue() async {
-  setState(() {
-    _showNameError     = _nameController.text.isEmpty;
-    _showEmailError    = _emailController.text.isEmpty;
-    _showPasswordError = _passwordController.text.isEmpty;
-    _showPhoneError    = _phoneController.text.isEmpty;
-    _showGenderError   = _selectedGender == null;
-  });
+    setState(() => _isLoading = true);
 
-  if (_showNameError || _showEmailError || _showPasswordError ||
-      _showPhoneError || _showGenderError) return;
+    try {
+      final response = await UserApiService.register(
+        name:     _nameController.text.trim(),
+        email:    _emailController.text.trim(),
+        password: _passwordController.text,
+        phone:    _phoneController.text.trim(),
+        gender:   _selectedGender,
+      );
 
-  setState(() => _isLoading = true);
+      final userData = response['data']['user'] as Map<String, dynamic>;
+      final token    = response['data']['token'] as String;
 
-  try {
-    final response = await UserApiService.register(
-      name:     _nameController.text.trim(),
-      email:    _emailController.text.trim(),
-      password: _passwordController.text,
-      phone:    _phoneController.text.trim(),
-      gender:   _selectedGender,
-    );
+      await UserSession.saveSession(
+        token:  token,
+        id:     int.tryParse(userData['id'].toString()) ?? 0,
+        name:   userData['name'].toString(),
+        email:  userData['email'].toString(),
+        phone:  userData['phone']?.toString() ?? '',
+        gender: userData['gender']?.toString() ?? '',
+        photo:  userData['photo']?.toString() ?? '',
+      );
 
-    final userData = response['data']['user'] as Map<String, dynamic>;
-    final token    = response['data']['token'] as String;
-
-    // Simpan session ke SharedPreferences
-    await UserSession.saveSession(
-      token:  token,
-      id:     userData['id'] as int,
-      name:   userData['name'] as String,
-      email:  userData['email'] as String,
-      phone:  userData['phone'] as String? ?? '',
-      gender: userData['gender'] as String? ?? '',
-      photo:  userData['photo'] as String? ?? '',
-    );
-
-    // Navigasi ke HomePage dengan nama asli dari API
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomePage(userName: userData['name'] as String),
-      ),
-      (route) => false,
-    );
-  } catch (e) {
-    setState(() => _isLoading = false);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(e.toString().replaceFirst('Exception: ', '')),
-        backgroundColor: Colors.red,
-      ),
-    );
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(userName: userData['name'].toString()),
+        ),
+        (route) => false,
+      );
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-}
 
   @override
   void dispose() {
@@ -198,9 +190,9 @@ void _validateAndContinue() async {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: (_selectedGender != null &&
-         _nameController.text.isNotEmpty &&
-         _emailController.text.isNotEmpty &&
-         !_isLoading)
+                           _nameController.text.isNotEmpty &&
+                           _emailController.text.isNotEmpty &&
+                           !_isLoading)
                     ? [const Color(0xFF90CAF9), const Color(0xFF4285F4)]
                     : [Colors.grey.shade400, Colors.grey.shade400]
                 ),
