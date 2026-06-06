@@ -403,7 +403,7 @@ class _ExplorePageState extends State<ExplorePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Most Popular At GYM",
+          "Find Your Gym",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         const SizedBox(height: 15),
