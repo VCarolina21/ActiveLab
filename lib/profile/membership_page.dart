@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../services/membership_api_service.dart';
 import '../payment/payment_page.dart';
@@ -10,10 +11,12 @@ class MembershipPage extends StatefulWidget {
   State<MembershipPage> createState() => _MembershipPageState();
 }
 
-class _MembershipPageState extends State<MembershipPage> {
+class _MembershipPageState extends State<MembershipPage>
+    with SingleTickerProviderStateMixin {
   List<UserMembershipModel> _memberships = [];
   bool _isLoading = true;
   String? _errorMsg;
+  late AnimationController _animController;
 
   final formatter = NumberFormat.currency(
     locale: 'id_ID',
@@ -21,10 +24,31 @@ class _MembershipPageState extends State<MembershipPage> {
     decimalDigits: 0,
   );
 
+  // ─── Design Tokens ───────────────────────────────────────────────
+  static const _bg = Color(0xFFF7F8FC);
+  static const _surface = Colors.white;
+  static const _primary = Color(0xFF3B5BDB);
+  static const _primaryLight = Color(0xFF748FFC);
+  static const _textPrimary = Color(0xFF1A1D2E);
+  static const _textSecondary = Color(0xFF8B92A5);
+  static const _border = Color(0xFFEAECF3);
+  static const _frozenStart = Color(0xFF74C0FC);
+  static const _frozenEnd = Color(0xFF339AF0);
+
   @override
   void initState() {
     super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
     _loadMemberships();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadMemberships() async {
@@ -37,6 +61,7 @@ class _MembershipPageState extends State<MembershipPage> {
       setState(() {
         _memberships = data;
       });
+      _animController.forward(from: 0);
     } catch (e) {
       setState(() {
         _errorMsg = e.toString().replaceFirst('Exception: ', '');
@@ -65,8 +90,30 @@ class _MembershipPageState extends State<MembershipPage> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(msg),
-        backgroundColor: isError ? Colors.red : Colors.green,
+        content: Row(
+          children: [
+            Icon(
+              isError
+                  ? Icons.error_outline_rounded
+                  : Icons.check_circle_outline_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                msg,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: isError
+            ? const Color(0xFFFA5252)
+            : const Color(0xFF40C057),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -79,7 +126,10 @@ class _MembershipPageState extends State<MembershipPage> {
       return;
     }
     _showMembershipOptionsSheet(
-      title: "Pilih Upgrade Membership",
+      title: "Upgrade Membership",
+      subtitle: "Pilih paket yang lebih tinggi",
+      iconData: Icons.trending_up_rounded,
+      iconColor: const Color(0xFFFF922B),
       options: options,
       onSelect: (selectedId) {
         Navigator.push(
@@ -104,7 +154,10 @@ class _MembershipPageState extends State<MembershipPage> {
       return;
     }
     _showMembershipOptionsSheet(
-      title: "Pilih Downgrade Membership",
+      title: "Downgrade Membership",
+      subtitle: "Pilih paket yang lebih rendah",
+      iconData: Icons.trending_down_rounded,
+      iconColor: const Color(0xFFFA5252),
       options: options,
       onSelect: (selectedId) async {
         try {
@@ -125,66 +178,105 @@ class _MembershipPageState extends State<MembershipPage> {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(14),
+                width: 64,
+                height: 64,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey, width: 3),
+                  color: const Color(0xFFFFF0F0),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(Icons.cancel_outlined, size: 50, color: Colors.grey),
+                child: const Icon(
+                  Icons.do_not_disturb_on_outlined,
+                  size: 32,
+                  color: Color(0xFFFA5252),
+                ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
               const Text(
                 "Berhenti Berlangganan?",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: _textPrimary,
+                  letterSpacing: -0.3,
+                ),
               ),
               const SizedBox(height: 10),
               Text(
                 "Membership \"${um.membershipName}\" di ${um.branchName} akan dinonaktifkan. Sisa hari tidak dapat dikembalikan.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
+                style: const TextStyle(
+                  color: _textSecondary,
+                  fontSize: 13.5,
+                  height: 1.55,
+                ),
               ),
-              const SizedBox(height: 24),
-              Row(children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      Navigator.pop(ctx);
-                      try {
-                        await MembershipApiService.cancelMembership(um.id);
-                        _showSnack("Membership berhasil diberhentikan");
-                        _loadMemberships();
-                      } catch (e) {
-                        _showSnack(e.toString().replaceFirst('Exception: ', ''), isError: true);
-                      }
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+              const SizedBox(height: 28),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        try {
+                          await MembershipApiService.cancelMembership(um.id);
+                          _showSnack("Membership berhasil diberhentikan");
+                          _loadMemberships();
+                        } catch (e) {
+                          _showSnack(
+                            e.toString().replaceFirst('Exception: ', ''),
+                            isError: true,
+                          );
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFFFA5252),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(color: Color(0xFFFFDEDE)),
+                        ),
+                      ),
+                      child: const Text(
+                        "Ya, Berhenti",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
-                    child: const Text("Ya, Berhenti", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF303F9F),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        "Batal",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
-                    child: const Text("Batal", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
-                ),
-              ]),
+                ],
+              ),
             ],
           ),
         ),
@@ -194,25 +286,69 @@ class _MembershipPageState extends State<MembershipPage> {
 
   void _showMembershipOptionsSheet({
     required String title,
+    required String subtitle,
+    required IconData iconData,
+    required Color iconColor,
     required List<Map<String, dynamic>> options,
     required void Function(int selectedId) onSelect,
   }) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (_) => Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: _border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
-            const SizedBox(height: 15),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(iconData, color: iconColor, size: 20),
+                ),
+                const SizedBox(width: 14),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: _textPrimary,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: _textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             ...options.map((opt) {
               final price = double.tryParse(opt['price'].toString()) ?? 0;
               return GestureDetector(
@@ -222,29 +358,29 @@ class _MembershipPageState extends State<MembershipPage> {
                 },
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F7F9),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                    color: _bg,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: _border),
                   ),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
+                          horizontal: 9,
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4285F4),
-                          borderRadius: BorderRadius.circular(6),
+                          color: _primary,
+                          borderRadius: BorderRadius.circular(7),
                         ),
                         child: Text(
                           "Lv ${opt['level']}",
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
@@ -254,23 +390,31 @@ class _MembershipPageState extends State<MembershipPage> {
                           opt['name'] as String,
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 15,
+                            fontSize: 14,
+                            color: _textPrimary,
                           ),
                         ),
                       ),
                       Text(
                         formatter.format(price),
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4285F4),
+                          fontWeight: FontWeight.w700,
+                          color: _primary,
+                          fontSize: 13,
                         ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        color: _textSecondary,
+                        size: 18,
                       ),
                     ],
                   ),
                 ),
               );
             }),
-            const SizedBox(height: 10),
+            const SizedBox(height: 4),
           ],
         ),
       ),
@@ -279,215 +423,373 @@ class _MembershipPageState extends State<MembershipPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: _bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: _bg,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+        scrolledUnderElevation: 0,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Container(
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: _surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _border),
+            ),
+            child: const Icon(
+              Icons.arrow_back_rounded,
+              color: _textPrimary,
+              size: 20,
+            ),
+          ),
         ),
         title: const Text(
           "My Memberships",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: _textPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+            letterSpacing: -0.4,
+          ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black),
-            onPressed: _loadMemberships,
+          GestureDetector(
+            onTap: _loadMemberships,
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(0, 10, 16, 10),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _border),
+              ),
+              child: const Icon(
+                Icons.refresh_rounded,
+                color: _textPrimary,
+                size: 20,
+              ),
+            ),
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF4285F4)),
-            )
-          : _errorMsg != null
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(_errorMsg!, style: const TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: _loadMemberships,
-                    child: const Text("Coba Lagi"),
-                  ),
-                ],
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 36,
+              height: 36,
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+                color: _primary,
+                backgroundColor: _primary.withOpacity(0.12),
               ),
-            )
-          : _memberships.isEmpty
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.card_membership, size: 60, color: Colors.grey),
-                  SizedBox(height: 15),
-                  Text(
-                    "Belum ada membership aktif",
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "Beli membership dari halaman Explore",
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: _memberships.length,
-              itemBuilder: (_, i) => _buildMembershipCard(_memberships[i]),
             ),
+            const SizedBox(height: 16),
+            const Text(
+              "Memuat membership...",
+              style: TextStyle(color: _textSecondary, fontSize: 13),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_errorMsg != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF0F0),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.wifi_off_rounded,
+                  size: 40,
+                  color: Color(0xFFFA5252),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                _errorMsg!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: _textSecondary,
+                  fontSize: 13.5,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _loadMemberships,
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: const Text("Coba Lagi"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _primary,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_memberships.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: _primary.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: Icon(
+                  Icons.card_membership_rounded,
+                  size: 44,
+                  color: _primary.withOpacity(0.4),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "Belum ada membership aktif",
+                style: TextStyle(
+                  color: _textPrimary,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Beli membership dari halaman Explore",
+                style: TextStyle(
+                  color: _textSecondary,
+                  fontSize: 13.5,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+      itemCount: _memberships.length,
+      itemBuilder: (_, i) {
+        final delay = i * 80;
+        return AnimatedBuilder(
+          animation: _animController,
+          builder: (context, child) {
+            final t = ((_animController.value * 1000 - delay) / 400).clamp(
+              0.0,
+              1.0,
+            );
+            final curve = Curves.easeOutCubic.transform(t);
+            return Transform.translate(
+              offset: Offset(0, 24 * (1 - curve)),
+              child: Opacity(opacity: curve, child: child),
+            );
+          },
+          child: _buildMembershipCard(_memberships[i]),
+        );
+      },
     );
   }
 
   Widget _buildMembershipCard(UserMembershipModel um) {
     final isFrozen = um.isFrozen;
+    final gradientColors = isFrozen
+        ? [_frozenStart, _frozenEnd]
+        : [_primary, _primaryLight];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: _surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: _border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: _primary.withOpacity(isFrozen ? 0.04 : 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         children: [
-
+          // ── Header card ──────────────────────────────────────────
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: isFrozen
-                    ? [Colors.grey.shade400, Colors.grey.shade600]
-                    : [const Color(0xFF0D47A1), const Color(0xFF42A5F5)],
+                colors: gradientColors,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
+                top: Radius.circular(24),
               ),
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          _statusChip(
+                            label: "Level ${um.level}",
+                            bg: Colors.white.withOpacity(0.2),
+                            textColor: Colors.white,
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            "Level ${um.level}",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                          if (isFrozen) ...[
+                            const SizedBox(width: 6),
+                            _statusChip(
+                              label: "❄️ Frozen",
+                              bg: Colors.white.withOpacity(0.2),
+                              textColor: Colors.white,
                             ),
-                          ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        um.membershipName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                          height: 1.1,
                         ),
-                        if (isFrozen) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.lightBlueAccent.withValues(
-                                alpha: 0.4,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Text(
-                              "❄️ Frozen",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_rounded,
+                            size: 12,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            um.branchName,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.75),
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      um.membershipName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      um.branchName,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const Spacer(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "${um.daysRemaining}",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
+                // days remaining badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        "${um.daysRemaining}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: -1,
+                        ),
                       ),
-                    ),
-                    const Text(
-                      "hari tersisa",
-                      style: TextStyle(color: Colors.white70, fontSize: 11),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      const Text(
+                        "hari\ntersisa",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                          height: 1.3,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
 
-
+          // ── Actions ──────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
             child: Column(
               children: [
-                // Baris 1: Freeze & Renew
                 Row(
                   children: [
                     Expanded(
                       child: _actionButton(
                         label: isFrozen ? "Unfreeze" : "Freeze",
-                        icon: isFrozen ? Icons.play_arrow : Icons.ac_unit,
-                        color: isFrozen ? Colors.green : Colors.lightBlue,
+                        icon: isFrozen
+                            ? Icons.play_arrow_rounded
+                            : Icons.ac_unit_rounded,
+                        color: isFrozen
+                            ? const Color(0xFF40C057)
+                            : const Color(0xFF339AF0),
                         onTap: () => _toggleFreeze(um),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: _actionButton(
                         label: "Renew",
-                        icon: Icons.refresh,
-                        color: const Color(0xFF4285F4),
+                        icon: Icons.autorenew_rounded,
+                        color: _primary,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -504,36 +806,35 @@ class _MembershipPageState extends State<MembershipPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                // Baris 2: Upgrade & Downgrade
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: _actionButton(
                         label: "Upgrade",
-                        icon: Icons.arrow_upward,
-                        color: Colors.orange,
+                        icon: Icons.trending_up_rounded,
+                        color: const Color(0xFFFF922B),
                         onTap: () => _showUpgradeSheet(um),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: _actionButton(
                         label: "Downgrade",
-                        icon: Icons.arrow_downward,
-                        color: Colors.redAccent,
+                        icon: Icons.trending_down_rounded,
+                        color: const Color(0xFFFA5252),
                         onTap: () => _showDowngradeSheet(um),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                // Baris 3: Berhenti Berlangganan
+                const SizedBox(height: 8),
                 _actionButton(
                   label: "Berhenti Berlangganan",
-                  icon: Icons.cancel_outlined,
-                  color: Colors.grey,
+                  icon: Icons.remove_circle_outline_rounded,
+                  color: _textSecondary,
                   onTap: () => _showCancelMembershipDialog(um),
+                  isDestructive: true,
                 ),
               ],
             ),
@@ -543,31 +844,57 @@ class _MembershipPageState extends State<MembershipPage> {
     );
   }
 
+  Widget _statusChip({
+    required String label,
+    required Color bg,
+    required Color textColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.1,
+        ),
+      ),
+    );
+  }
+
   Widget _actionButton({
     required String label,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
+    bool isDestructive = false,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 11),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withValues(alpha: 0.4)),
+          color: isDestructive ? _bg : color.withOpacity(0.07),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isDestructive ? _border : color.withOpacity(0.18),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 16),
+            Icon(icon, color: color, size: 15),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 color: color,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
             ),
