@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:activelab/config/services/user_session.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter/services.dart';
 import '../services/booking_api_service.dart';
 import '../home/home_page.dart';
-
 
 class CheckoutDetailPage extends StatefulWidget {
   final BookingModel booking;
@@ -16,7 +15,7 @@ class CheckoutDetailPage extends StatefulWidget {
 }
 
 class _CheckoutDetailPageState extends State<CheckoutDetailPage> {
-  QrData? _qrData;
+  CodeData? _codeData;
   bool _isLoading = true;
   String? _error;
   Timer? _pollingTimer;
@@ -26,7 +25,7 @@ class _CheckoutDetailPageState extends State<CheckoutDetailPage> {
   @override
   void initState() {
     super.initState();
-    _loadQr();
+    _loadCode();
   }
 
   @override
@@ -36,13 +35,13 @@ class _CheckoutDetailPageState extends State<CheckoutDetailPage> {
     super.dispose();
   }
 
-  Future<void> _loadQr() async {
+  Future<void> _loadCode() async {
     setState(() { _isLoading = true; _error = null; });
     try {
-      final qr = await BookingApiService.getCheckoutQr(widget.booking.id);
+      final code = await BookingApiService.getCheckoutCode(widget.booking.id);
       setState(() {
-        _qrData = qr;
-        _remaining = qr.expiresAt.difference(DateTime.now());
+        _codeData = code;
+        _remaining = code.expiresAt.difference(DateTime.now());
       });
       _startCountdown();
       _startPolling();
@@ -57,7 +56,7 @@ class _CheckoutDetailPageState extends State<CheckoutDetailPage> {
     _countdownTimer?.cancel();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      final r = _qrData!.expiresAt.difference(DateTime.now());
+      final r = _codeData!.expiresAt.difference(DateTime.now());
       setState(() => _remaining = r.isNegative ? Duration.zero : r);
     });
   }
@@ -95,12 +94,15 @@ class _CheckoutDetailPageState extends State<CheckoutDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Identical structure to CheckinDetailPage but for checkout
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white, elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black), onPressed: () { _pollingTimer?.cancel(); Navigator.pop(context); }),
+        backgroundColor: Colors.white, 
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black), 
+          onPressed: () { _pollingTimer?.cancel(); Navigator.pop(context); },
+        ),
         title: const Text("Check Out", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
       ),
       body: _isLoading
@@ -111,55 +113,94 @@ class _CheckoutDetailPageState extends State<CheckoutDetailPage> {
               const SizedBox(height: 15),
               Text(_error!, style: const TextStyle(color: Colors.grey), textAlign: TextAlign.center),
               const SizedBox(height: 20),
-              ElevatedButton(onPressed: _loadQr, child: const Text("Coba Lagi")),
+              ElevatedButton(onPressed: _loadCode, child: const Text("Coba Lagi")),
             ]))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(children: [
+                // Info jadwal
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(color: const Color(0xFFF5F7F9), borderRadius: BorderRadius.circular(15)),
                   child: Column(children: [
-                    Text("${widget.booking.schedule['service_type_name']} - ${widget.booking.schedule['service_name_name']}",
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                    Text(
+                      "${widget.booking.schedule['service_type_name']} - ${widget.booking.schedule['service_name_name']}",
+                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 8),
-                    Text("${widget.booking.schedule['date']}  •  ${widget.booking.schedule['start_time']} - ${widget.booking.schedule['end_time']}",
-                      style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                    Text(
+                      "${widget.booking.schedule['date']}  •  ${widget.booking.schedule['start_time']} - ${widget.booking.schedule['end_time']}",
+                      style: const TextStyle(color: Colors.grey, fontSize: 13),
+                    ),
+                    Text(
+                      widget.booking.branch['name'] as String? ?? '',
+                      style: const TextStyle(color: Colors.grey, fontSize: 13),
+                    ),
                   ]),
                 ),
-                const SizedBox(height: 24),
-                const Text("Tunjukkan QR ini ke Admin untuk Check Out",
+                const SizedBox(height: 30),
+
+                const Text("Tunjukkan kode ini ke Admin untuk Check Out",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textAlign: TextAlign.center),
                 const SizedBox(height: 8),
+
+                // Countdown
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(Icons.timer, color: _remaining.inMinutes < 10 ? Colors.red : Colors.green, size: 18),
+                  Icon(Icons.timer, color: _remaining.inMinutes < 5 ? Colors.red : Colors.green, size: 18),
                   const SizedBox(width: 6),
                   Text("Expired dalam: $_timeString",
-                    style: TextStyle(color: _remaining.inMinutes < 10 ? Colors.red : Colors.green, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                      color: _remaining.inMinutes < 5 ? Colors.red : Colors.green,
+                      fontWeight: FontWeight.bold,
+                    )),
                 ]),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white, borderRadius: BorderRadius.circular(20),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 5))],
+                const SizedBox(height: 30),
+
+                // ── Kode Unik (BESAR, Gradient Hijau) ────────────────
+                GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: _codeData!.code));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Kode disalin"), duration: Duration(seconds: 1)),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 24),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.green.shade700, Colors.green.shade400],
+                        begin: Alignment.topLeft, end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [BoxShadow(
+                        color: Colors.green.withValues(alpha: 0.3),
+                        blurRadius: 20, offset: const Offset(0, 8),
+                      )],
+                    ),
+                    child: Column(children: [
+                      const Text("KODE CHECK-OUT",
+                        style: TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 2)),
+                      const SizedBox(height: 12),
+                      Text(
+                        _codeData!.code,
+                        style: const TextStyle(
+                          color: Colors.white, fontSize: 48,
+                          fontWeight: FontWeight.bold, letterSpacing: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Icon(Icons.copy, color: Colors.white54, size: 14),
+                        SizedBox(width: 4),
+                        Text("Tap untuk salin", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                      ]),
+                    ]),
                   ),
-                  child: QrImageView(data: _qrData!.qrToken, version: QrVersions.auto, size: 250, backgroundColor: Colors.white),
                 ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(border: Border.all(color: Colors.green, width: 1.5), borderRadius: BorderRadius.circular(12)),
-                  child: Column(children: [
-                    const Text("Kode Manual Check-out", style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    const SizedBox(height: 8),
-                    Text(_qrData!.code,
-                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.green, letterSpacing: 6)),
-                    const SizedBox(height: 4),
-                    const Text("(Berikan ke admin jika QR tidak bisa di-scan)", style: TextStyle(color: Colors.grey, fontSize: 11)),
-                  ]),
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
+
+                // Polling indicator
                 const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.green)),
                   SizedBox(width: 10),

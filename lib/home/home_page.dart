@@ -199,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                     }).toList(),
                   ),
 
-                // ── TOMBOL PAGINATION DARI API ──
+
                 if (_totalPages > 1)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

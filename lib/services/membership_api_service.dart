@@ -3,7 +3,6 @@ import 'package:activelab/config/services/user_session.dart';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 
-
 class UserMembershipModel {
   final int id;
   final String status;
@@ -130,6 +129,15 @@ class MembershipApiService {
       Uri.parse('${AppConfig.baseUrl}/users/memberships/$userMembershipId/downgrade'),
       headers: await _authHeaders(),
       body: jsonEncode({'new_membership_id': newMembershipId}),
+    );
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    if (!data['success']) throw Exception(data['message']);
+  }
+
+  static Future<void> cancelMembership(int userMembershipId) async {
+    final res = await http.post(
+      Uri.parse('${AppConfig.baseUrl}/users/memberships/$userMembershipId/cancel'),
+      headers: await _authHeaders(),
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (!data['success']) throw Exception(data['message']);

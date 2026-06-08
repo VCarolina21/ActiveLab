@@ -47,19 +47,16 @@ class _CheckOutPageState extends State<CheckOutPage> {
       final all = await BookingApiService.getUserBookings();
       final now = DateTime.now();
 
-      // Ambil yang sudah check-in DAN checkout belum expired
-      // Expiry checkout = schedule end_time + 1 jam
-      // Kita derive dari schedule data
+
       final checkedIn = all.where((b) {
         if (!b.isCheckedIn) return false;
 
-        // Kalau checkout_qr_expires_at sudah diset, pakai itu
+
         final checkoutExpiry = b.checkoutQrExpiresAt;
         if (checkoutExpiry != null) {
           return checkoutExpiry.isAfter(now);
         }
 
-        // Kalau belum diset, hitung dari schedule end_time + 1 jam
         final schedDate = b.schedule['date'] as String? ?? '';
         final schedEnd = b.schedule['end_time'] as String? ?? '';
         if (schedDate.isEmpty || schedEnd.isEmpty) return true;
@@ -110,10 +107,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
       backgroundColor: const Color(0xFFF4F8FF),
       body: Column(
         children: [
-          // ── Header modern ──────────────────────────────────
           _buildModernHeader(),
 
-          // ── Section label ──────────────────────────────────
+
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
             child: Row(
@@ -149,7 +145,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
             ),
           ),
 
-          // ── LIST BOOKING ───────────────────────────────────
+
           Expanded(
             child: Column(
               children: [
@@ -171,7 +167,6 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         ),
                 ),
 
-                // ── Tombol Check-In / History / Check-Out ──
                 _buildModernBottomNav(context),
               ],
             ),
@@ -398,11 +393,11 @@ class _CheckOutPageState extends State<CheckOutPage> {
     );
   }
 
-  // Card booking yang menunggu checkout
+
   Widget _buildBookingCard(BookingModel booking) {
     final sch = booking.schedule;
 
-    // Hitung deadline checkout
+
     String deadlineText = "";
     final checkoutExpiry = booking.checkoutQrExpiresAt;
     if (checkoutExpiry != null) {
@@ -436,7 +431,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
       }
     }
 
-    // Waktu check-in dilakukan
+
     final checkinTime = booking.checkinAt;
     final checkinStr = checkinTime != null
         ? "${checkinTime.hour.toString().padLeft(2, '0')}:${checkinTime.minute.toString().padLeft(2, '0')}"
@@ -624,7 +619,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
     );
   }
 
-  // ── Helper info row ─────────────────────────────────────
+
   Widget _infoRow(IconData icon, String text) {
     return Row(
       children: [
@@ -640,7 +635,6 @@ class _CheckOutPageState extends State<CheckOutPage> {
     );
   }
 
-  // ── 3 Tombol bawah ───────────────────────────────────────
 
   Widget _buildActionButtons(BuildContext context) {
     return Row(
