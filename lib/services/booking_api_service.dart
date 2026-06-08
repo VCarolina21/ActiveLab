@@ -3,7 +3,6 @@ import 'package:activelab/config/services/user_session.dart';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 
-
 class BookingModel {
   final int id;
   final int userId;
@@ -53,18 +52,11 @@ class BookingModel {
   );
 }
 
-class QrData {
-  final String qrToken;
-  final String code;
+class CodeData {
+  final String code;           // 6-char unique code
   final DateTime expiresAt;
 
-  QrData({required this.qrToken, required this.code, required this.expiresAt});
-
-  factory QrData.fromJson(Map<String, dynamic> json) => QrData(
-    qrToken:   json['qr_token'] as String,
-    code:      json['checkin_code'] as String? ?? json['checkout_code'] as String? ?? '',
-    expiresAt: DateTime.parse(json['expires_at'] as String),
-  );
+  CodeData({required this.code, required this.expiresAt});
 }
 
 class BookingApiService {
@@ -129,32 +121,30 @@ class BookingApiService {
     if (!data['success']) throw Exception(data['message']);
   }
 
-  static Future<QrData> getCheckinQr(int bookingId) async {
+  static Future<CodeData> getCheckinCode(int bookingId) async {
     final res = await http.get(
-      Uri.parse('${AppConfig.baseUrl}/bookings/$bookingId/checkin-qr'),
+      Uri.parse('${AppConfig.baseUrl}/bookings/$bookingId/checkin-code'),
       headers: await _authHeaders(),
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (!data['success']) throw Exception(data['message']);
     final d = data['data'] as Map<String, dynamic>;
-    return QrData(
-      qrToken:   d['qr_token'] as String,
-      code:      d['checkin_code'] as String? ?? '',
+    return CodeData(
+      code:      d['checkin_code'] as String,
       expiresAt: DateTime.parse(d['expires_at'] as String),
     );
   }
 
-  static Future<QrData> getCheckoutQr(int bookingId) async {
+  static Future<CodeData> getCheckoutCode(int bookingId) async {
     final res = await http.get(
-      Uri.parse('${AppConfig.baseUrl}/bookings/$bookingId/checkout-qr'),
+      Uri.parse('${AppConfig.baseUrl}/bookings/$bookingId/checkout-code'),
       headers: await _authHeaders(),
     );
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     if (!data['success']) throw Exception(data['message']);
     final d = data['data'] as Map<String, dynamic>;
-    return QrData(
-      qrToken:   d['qr_token'] as String,
-      code:      d['checkout_code'] as String? ?? '',
+    return CodeData(
+      code:      d['checkout_code'] as String,
       expiresAt: DateTime.parse(d['expires_at'] as String),
     );
   }

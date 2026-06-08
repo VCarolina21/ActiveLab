@@ -121,6 +121,77 @@ class _MembershipPageState extends State<MembershipPage> {
     );
   }
 
+  void _showCancelMembershipDialog(UserMembershipModel um) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey, width: 3),
+                ),
+                child: const Icon(Icons.cancel_outlined, size: 50, color: Colors.grey),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                "Berhenti Berlangganan?",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Membership \"${um.membershipName}\" di ${um.branchName} akan dinonaktifkan. Sisa hari tidak dapat dikembalikan.",
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+              const SizedBox(height: 24),
+              Row(children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      Navigator.pop(ctx);
+                      try {
+                        await MembershipApiService.cancelMembership(um.id);
+                        _showSnack("Membership berhasil diberhentikan");
+                        _loadMemberships();
+                      } catch (e) {
+                        _showSnack(e.toString().replaceFirst('Exception: ', ''), isError: true);
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.grey),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text("Ya, Berhenti", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF303F9F),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text("Batal", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showMembershipOptionsSheet({
     required String title,
     required List<Map<String, dynamic>> options,
@@ -291,7 +362,7 @@ class _MembershipPageState extends State<MembershipPage> {
       ),
       child: Column(
         children: [
-          // ── Header card ──────────────────────────────────────
+
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -395,7 +466,7 @@ class _MembershipPageState extends State<MembershipPage> {
             ),
           ),
 
-          // ── Action buttons ───────────────────────────────────
+
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -455,6 +526,14 @@ class _MembershipPageState extends State<MembershipPage> {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 10),
+                // Baris 3: Berhenti Berlangganan
+                _actionButton(
+                  label: "Berhenti Berlangganan",
+                  icon: Icons.cancel_outlined,
+                  color: Colors.grey,
+                  onTap: () => _showCancelMembershipDialog(um),
                 ),
               ],
             ),

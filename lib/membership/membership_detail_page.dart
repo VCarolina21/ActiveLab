@@ -3,10 +3,10 @@ import 'package:activelab/payment/payment_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/branch_api_service.dart';
-
+import '../services/membership_api_service.dart'; // Tambahkan import ini jika belum ada
 import '../sign_in/sign_page.dart'; 
 
-class MembershipDetailPage extends StatelessWidget {
+class MembershipDetailPage extends StatefulWidget {
   final MembershipModel membership;
   final int branchId;
   final String branchName;
@@ -17,6 +17,36 @@ class MembershipDetailPage extends StatelessWidget {
     required this.branchId,
     required this.branchName,
   });
+
+  @override
+  State<MembershipDetailPage> createState() => _MembershipDetailPageState();
+}
+
+class _MembershipDetailPageState extends State<MembershipDetailPage> {
+  bool _hasExistingMembership = false;
+  bool _isCheckingMembership = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingMembership();
+  }
+
+  Future<void> _checkExistingMembership() async {
+    final isLoggedIn = await UserSession.isLoggedIn();
+    if (!isLoggedIn) return;
+
+    setState(() => _isCheckingMembership = true);
+    try {
+      final memberships = await MembershipApiService.getUserMemberships();
+      final hasExisting = memberships.any(
+        (m) => m.branchId == widget.branchId && (m.status == 'active' || m.status == 'frozen'),
+      );
+      setState(() => _hasExistingMembership = hasExisting);
+    } catch (_) {} finally {
+      setState(() => _isCheckingMembership = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +69,7 @@ class MembershipDetailPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // ── Header gradient ─────────────────────────────────
+
             Container(
               width: double.infinity,
               decoration: const BoxDecoration(
@@ -60,13 +90,13 @@ class MembershipDetailPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      "Level ${membership.level}",
+                      "Level ${widget.membership.level}",
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    membership.name,
+                    widget.membership.name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 28,
@@ -75,14 +105,14 @@ class MembershipDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    branchName,
+                    widget.branchName,
                     style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
                   ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
                       Text(
-                        formatter.format(membership.price),
+                        formatter.format(widget.membership.price),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 32,
@@ -97,7 +127,7 @@ class MembershipDetailPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          "${membership.activeDays} Hari",
+                          "${widget.membership.activeDays} Hari",
                           style: const TextStyle(color: Colors.white, fontSize: 13),
                         ),
                       ),
@@ -112,30 +142,29 @@ class MembershipDetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Deskripsi ────────────────────────────────
-                  if (membership.description != null && membership.description!.isNotEmpty) ...[
+
+                  if (widget.membership.description != null && widget.membership.description!.isNotEmpty) ...[
                     const Text(
                       "Deskripsi",
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      membership.description!,
+                      widget.membership.description!,
                       style: const TextStyle(color: Colors.grey, fontSize: 14, height: 1.6),
                     ),
                     const SizedBox(height: 25),
                   ],
 
-                  // ── Keuntungan ───────────────────────────────
                   const Text(
                     "Keuntungan",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
-                  if (membership.benefits.isEmpty)
+                  if (widget.membership.benefits.isEmpty)
                     const Text("Tidak ada keuntungan tambahan", style: TextStyle(color: Colors.grey))
                   else
-                    ...membership.benefits.map((b) => Padding(
+                    ...widget.membership.benefits.map((b) => Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Row(
                         children: [
@@ -170,8 +199,7 @@ class MembershipDetailPage extends StatelessWidget {
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
-              onPressed: () async {
-                // Cek apakah sudah login
+              onPressed: _hasExistingMembership ? null : () async {
                 final isLoggedIn = await UserSession.isLoggedIn();
                 if (!context.mounted) return;
                 if (!isLoggedIn) {
@@ -181,21 +209,24 @@ class MembershipDetailPage extends StatelessWidget {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const SignPage()));
                   return;
                 }
-                // Tampilkan bottom sheet pilih metode pembayaran
                 _showPaymentMethodSheet(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4285F4),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
               ),
-              child: Text(
-                "Beli — ${formatter.format(membership.price)}",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: _isCheckingMembership
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                    )
+                  : Text(
+                      _hasExistingMembership
+                          ? "Sudah Punya Membership di Cabang Ini"
+                          : "Beli — ${formatter.format(widget.membership.price)}",
+                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
             ),
           ),
         ),
@@ -220,7 +251,7 @@ class MembershipDetailPage extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            // ── QRIS option ──────────────────────────────────
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
@@ -254,7 +285,7 @@ class MembershipDetailPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => PaymentPage(
-                        membershipId: membership.id,
+                        membershipId: widget.membership.id,
                         transactionType: 'new',
                       ),
                     ),

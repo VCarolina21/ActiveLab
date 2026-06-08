@@ -44,7 +44,7 @@ class _CheckInPageState extends State<CheckInPage> {
   void initState() {
     super.initState();
     _loadBookings();
-    // Cek expiry setiap menit
+
     _expireTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       _removeExpired();
     });
@@ -60,18 +60,16 @@ class _CheckInPageState extends State<CheckInPage> {
     setState(() => _isLoading = true);
     try {
       final all = await BookingApiService.getUserBookings();
-      // Ambil hanya yang pending DAN belum expired check-in
+
       final now = DateTime.now();
       final pending = all.where((b) {
         if (!b.isPending) return false;
-        // checkin_qr_expires_at = schedule end time (expiry check-in)
         final expires = b.checkinQrExpiresAt;
-        if (expires == null) return true; // belum ada expiry → masih valid
+        if (expires == null) return true; 
         return expires.isAfter(now);
       }).toList();
       setState(() => _pendingBookings = pending);
     } catch (_) {
-      // Gagal load → tampilkan kosong
     } finally {
       setState(() => _isLoading = false);
     }
@@ -94,10 +92,10 @@ class _CheckInPageState extends State<CheckInPage> {
       backgroundColor: const Color(0xFFF4F8FF),
       body: Column(
         children: [
-          // ── Header modern ──────────────────────────────────
+
           _buildModernHeader(),
 
-          // ── Section label ──────────────────────────────────
+
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
             child: Row(
@@ -133,7 +131,7 @@ class _CheckInPageState extends State<CheckInPage> {
             ),
           ),
 
-          // ── LIST BOOKING ───────────────────────────────────
+
           Expanded(
             child: Column(
               children: [
@@ -568,7 +566,7 @@ class _CheckInPageState extends State<CheckInPage> {
     );
   }
 
-  // ── Helper info row ─────────────────────────────────────
+
   Widget _infoRow(IconData icon, String text) {
     return Row(
       children: [
@@ -579,7 +577,7 @@ class _CheckInPageState extends State<CheckInPage> {
     );
   }
 
-  // ── 3 Tombol bawah ───────────────────────────────────────
+
 
   Widget _buildActionButtons(BuildContext context) {
     return Row(
