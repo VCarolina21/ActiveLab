@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:activelab/config/app_config.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'user_session.dart';
 
 class UserApiService {
-  /// Helper: header untuk request yang butuh auth
   static Future<Map<String, String>> _authHeaders() async {
     final token = await UserSession.getToken();
     return {
@@ -13,8 +13,6 @@ class UserApiService {
       'Authorization': 'Bearer $token',
     };
   }
-
-  // ─── REGISTER ────────────────────────────────────────────────
 
   static Future<Map<String, dynamic>> register({
     required String name,
@@ -42,8 +40,6 @@ class UserApiService {
     return data;
   }
 
-  // ─── LOGIN ───────────────────────────────────────────────────
-
   static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
@@ -61,8 +57,6 @@ class UserApiService {
     return data;
   }
 
-  // ─── GET PROFILE ─────────────────────────────────────────────
-
   static Future<Map<String, dynamic>> getProfile() async {
     final res = await http.get(
       Uri.parse('${AppConfig.baseUrl}/users/profile'),
@@ -76,8 +70,6 @@ class UserApiService {
     return data;
   }
 
-  // ─── UPDATE PROFILE ──────────────────────────────────────────
-
   static Future<Map<String, dynamic>> updateProfile({
     required String name,
     String? phone,
@@ -87,7 +79,6 @@ class UserApiService {
     final token = await UserSession.getToken();
     final uri = Uri.parse('${AppConfig.baseUrl}/users/profile');
 
-    // Pakai MultipartRequest karena ada kemungkinan upload foto
     final request = http.MultipartRequest('PUT', uri)
       ..headers['Authorization'] = 'Bearer $token'
       ..fields['name'] = name;
@@ -95,16 +86,16 @@ class UserApiService {
     if (phone != null && phone.isNotEmpty) request.fields['phone'] = phone;
     if (gender != null && gender.isNotEmpty) request.fields['gender'] = gender;
 
-    // Tambahkan file foto kalau ada
     if (photoFile != null) {
       final bytes = await photoFile.readAsBytes();
       final extension = photoFile.path.split('.').last.toLowerCase();
-      final mimeType = extension == 'png' ? 'image/png' : 'image/jpeg';
+      final subType = extension == 'png' ? 'png' : 'jpeg';
 
       request.files.add(http.MultipartFile.fromBytes(
-        'user_photo', // harus cocok dengan upload.single("user_photo") di backend
+        'user_photo',
         bytes,
         filename: 'profile.$extension',
+        contentType: MediaType('image', subType),
       ));
     }
 
@@ -117,8 +108,6 @@ class UserApiService {
     }
     return data;
   }
-
-  // ─── DELETE ACCOUNT ──────────────────────────────────────────
 
   static Future<void> deleteAccount() async {
     final res = await http.delete(

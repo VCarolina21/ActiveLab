@@ -1,6 +1,8 @@
+import 'package:activelab/chat/chat_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/explore_api_service.dart';
+
 
 class MentorDetailPage extends StatelessWidget {
   final StaffModel staff;
@@ -190,7 +192,8 @@ class MentorDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Tombol Chat (TIDAK BERUBAH)
+                  
+
                   Container(
                     width: double.infinity,
                     height: 55,
@@ -201,7 +204,18 @@ class MentorDetailPage extends StatelessWidget {
                       ),
                     ),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatDetailPage(
+
+                              userId: staff.id, 
+                              userName: staff.name,
+                            ),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
