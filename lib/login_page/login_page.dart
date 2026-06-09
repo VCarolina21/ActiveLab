@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:activelab/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
@@ -160,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const ProfilePage(
+                                  builder: (context) => const HomePage(
                                     userName: "Guest",
                                   ),
                                 ),

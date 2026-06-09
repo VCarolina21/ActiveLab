@@ -464,7 +464,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Ganti _buildFacilityItem dengan _buildServiceTypeItem dinamis
   Widget _buildServiceTypeItem(ServiceTypeModel type) {
     return GestureDetector(
       onTap: () {

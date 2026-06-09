@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'chat_service.dart';
 import 'chat_detail_page.dart';
+import '../home/home_page.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  final String userName;
+
+  const ChatPage({
+    Key? key,
+    this.userName = '',
+  }) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -38,7 +44,6 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  // Warna aksen ungu-biru untuk chat
   static const _accentColor = Color(0xFF5B4CF5);
 
   @override
@@ -57,22 +62,22 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   )
                 : _staffList.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-                    itemCount: _staffList.length,
-                    itemBuilder: (context, index) {
-                      final staff = _staffList[index];
-                      final staffName = staff['name'] ?? 'Staff ${staff['id']}';
-                      final staffId = staff['id'] ?? 0;
-                      return _buildStaffCard(
-                        context,
-                        staffId,
-                        staffName,
-                        index,
-                      );
-                    },
-                  ),
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                        itemCount: _staffList.length,
+                        itemBuilder: (context, index) {
+                          final staff = _staffList[index];
+                          final staffName = staff['name'] ?? 'Staff ${staff['id']}';
+                          final staffId = staff['id'] ?? 0;
+                          return _buildStaffCard(
+                            context,
+                            staffId,
+                            staffName,
+                            index,
+                          );
+                        },
+                      ),
           ),
         ],
       ),
@@ -94,11 +99,17 @@ class _ChatPageState extends State<ChatPage> {
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           child: Column(
             children: [
-              // App bar row
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(userName: widget.userName),
+                        ),
+                      );
+                    },
                     child: Container(
                       width: 38,
                       height: 38,
@@ -126,12 +137,10 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
-                  // placeholder agar title tetap center
                   const SizedBox(width: 38),
                 ],
               ),
               const SizedBox(height: 18),
-              // Info card
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -195,7 +204,6 @@ class _ChatPageState extends State<ChatPage> {
     String staffName,
     int index,
   ) {
-    // Palet warna avatar bergantian
     final avatarColors = [
       const Color(0xFF5B4CF5),
       const Color(0xFF1A6FD4),
@@ -232,7 +240,6 @@ class _ChatPageState extends State<ChatPage> {
         ),
         child: Row(
           children: [
-            // Avatar
             Container(
               width: 48,
               height: 48,
@@ -252,7 +259,6 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
             const SizedBox(width: 14),
-            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +292,6 @@ class _ChatPageState extends State<ChatPage> {
                 ],
               ),
             ),
-            // Chat icon button
             Container(
               width: 38,
               height: 38,
